@@ -9,6 +9,375 @@
 
 
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <!-- =================================================
+         PROJECT: MY WEBSITE
+         FILE: index.html
+         LANGUAGE: HTML5
+
+         PURPOSE:
+         HTML creates the structure and content of a website.
+
+         ================================================= -->
+
+
+    <!-- 01. BASIC DOCUMENT INFORMATION -->
+
+    <!-- Defines character encoding for the website -->
+    <meta charset="UTF-8">
+
+    <!-- Makes website responsive on mobile devices -->
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <!-- Description shown by search engines -->
+    <meta name="description"
+          content="Welcome to my professional website.">
+
+    <!-- Website title shown in browser tab -->
+    <title>My Website | Home</title>
+
+
+    <!-- =================================================
+         02. CSS CONNECTION
+         Connects external CSS file to HTML.
+         ================================================= -->
+
+    <link rel="stylesheet" href="styles.css">
+
+
+    <!-- =================================================
+         03. JAVASCRIPT CONNECTION
+         defer loads JavaScript after HTML parsing.
+         ================================================= -->
+
+    <script src="script.js" defer></script>
+
+</head>
+
+
+<body>
+
+
+    <!-- =================================================
+         04. HEADER SECTION
+         Contains website logo and navigation menu.
+         ================================================= -->
+
+    <header>
+
+        <div class="container">
+
+            <nav class="navbar">
+
+                <!-- Website logo or brand name -->
+                <a href="#home" class="logo">
+                    MyWebsite
+                </a>
+
+
+                <!-- Mobile navigation toggle button -->
+                <button
+                    class="menu-toggle"
+                    id="menuToggle"
+                    type="button"
+                    aria-label="Open navigation menu"
+                    aria-expanded="false"
+                    aria-controls="navLinks">
+
+                    ☰
+
+                </button>
+
+
+                <!-- Main navigation links -->
+                <ul class="nav-links" id="navLinks">
+
+                    <li>
+                        <a href="#home">Home</a>
+                    </li>
+
+                    <li>
+                        <a href="#about">About</a>
+                    </li>
+
+                    <li>
+                        <a href="#services">Services</a>
+                    </li>
+
+                    <li>
+                        <a href="#contact">Contact</a>
+                    </li>
+
+                </ul>
+
+            </nav>
+
+        </div>
+
+    </header>
+
+
+
+    <!-- =================================================
+         05. MAIN WEBSITE CONTENT
+         Contains the main sections of the website.
+         ================================================= -->
+
+    <main>
+
+
+        <!-- =================================================
+             06. HERO SECTION
+             First section visitors see on the website.
+             ================================================= -->
+
+        <section class="hero" id="home">
+
+            <div class="container">
+
+                <!-- Main website heading -->
+                <h1>
+                    Welcome to My Website
+                </h1>
+
+
+                <!-- Short introduction -->
+                <p>
+                    Discover my website, explore our services
+                    and learn more about what we offer.
+                </p>
+
+
+                <!-- Button navigates to services section -->
+                <a href="#services" class="btn">
+                    Explore Services
+                </a>
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             07. ABOUT SECTION
+             Provides information about the website.
+             ================================================= -->
+
+        <section class="about container" id="about">
+
+            <h2>About Us</h2>
+
+            <p>
+                Welcome to our website. We aim to provide
+                useful information, quality services and
+                an excellent user experience.
+            </p>
+
+        </section>
+
+
+
+        <!-- =================================================
+             08. SERVICES SECTION
+             Displays services using reusable cards.
+             ================================================= -->
+
+        <section class="services container" id="services">
+
+            <h2 class="text-center">
+                Our Services
+            </h2>
+
+            <p class="text-center">
+                Explore the services we provide.
+            </p>
+
+
+            <!-- Grid container for service cards -->
+            <div class="grid">
+
+
+                <!-- Service Card 1 -->
+                <article class="card">
+
+                    <h3>Web Design</h3>
+
+                    <p>
+                        Create attractive and professional
+                        website designs.
+                    </p>
+
+                    <a href="#contact">
+                        Learn More
+                    </a>
+
+                </article>
+
+
+
+                <!-- Service Card 2 -->
+                <article class="card">
+
+                    <h3>Development</h3>
+
+                    <p>
+                        Build responsive and functional
+                        websites using modern technologies.
+                    </p>
+
+                    <a href="#contact">
+                        Learn More
+                    </a>
+
+                </article>
+
+
+
+                <!-- Service Card 3 -->
+                <article class="card">
+
+                    <h3>Digital Services</h3>
+
+                    <p>
+                        Discover useful digital solutions
+                        for your business.
+                    </p>
+
+                    <a href="#contact">
+                        Learn More
+                    </a>
+
+                </article>
+
+
+            </div>
+
+        </section>
+
+
+
+        <!-- =================================================
+             09. CONTACT SECTION
+             Allows visitors to enter their information.
+             ================================================= -->
+
+        <section class="contact container" id="contact">
+
+            <h2>Contact Us</h2>
+
+            <p>
+                Fill out the form to get in touch with us.
+            </p>
+
+
+            <!-- Contact form -->
+            <form id="contactForm">
+
+                <!-- Name input -->
+                <label for="name">
+                    Your Name
+                </label>
+
+                <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    placeholder="Enter your name"
+                    autocomplete="name"
+                    required>
+
+
+                <!-- Email input -->
+                <label for="email">
+                    Your Email
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="Enter your email"
+                    autocomplete="email"
+                    required>
+
+
+                <!-- Message input -->
+                <label for="message">
+                    Your Message
+                </label>
+
+                <textarea
+                    id="message"
+                    name="message"
+                    placeholder="Write your message"
+                    required></textarea>
+
+
+                <!-- Form submission button -->
+                <button type="submit" class="btn">
+                    Send Message
+                </button>
+
+
+                <!-- JavaScript displays form status here -->
+                <p
+                    id="formStatus"
+                    role="status"
+                    aria-live="polite">
+                </p>
+
+            </form>
+
+        </section>
+
+
+    </main>
+
+
+
+    <!-- =================================================
+         10. FOOTER SECTION
+         Displays copyright and website information.
+         ================================================= -->
+
+    <footer>
+
+        <div class="container">
+
+            <p>
+                &copy; 2026 MyWebsite.
+                All Rights Reserved.
+            </p>
+
+            <p>
+                Designed and developed with HTML, CSS
+                and JavaScript.
+            </p>
+
+        </div>
+
+    </footer>
+
+
+
+    <!-- =================================================
+         END OF INDEX.HTML
+
+         HTML creates the website structure.
+         CSS controls the website appearance.
+         JavaScript controls website functionality.
+
+         ================================================= -->
+
+</body>
+
+</html>
 
 
 
