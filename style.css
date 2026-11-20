@@ -647,6 +647,82 @@ footer p {
     }
 }
 
+/* =========================================================
+   EXTRA 01. MOBILE MENU BUTTON
+   Styles the navigation toggle button.
+   ========================================================= */
+
+.menu-toggle {
+    display: none;               /* Hidden on desktop */
+    background: none;
+    border: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: var(--primary-color);
+}
+
+
+/* =========================================================
+   EXTRA 02. NAVIGATION MENU STATES
+   Controls the mobile menu visibility.
+   ========================================================= */
+
+@media screen and (max-width: 600px) {
+
+    .menu-toggle {
+        display: block;          /* Shows button on mobile */
+    }
+
+    .navbar {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .nav-links {
+        display: none;           /* Hides menu initially */
+        width: 100%;
+        padding: 15px 0;
+    }
+
+    .nav-links.active {
+        display: flex;           /* Shows menu when opened */
+    }
+
+}
+
+
+/* =========================================================
+   EXTRA 03. FORM LABELS
+   Makes form labels readable.
+   ========================================================= */
+
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   EXTRA 04. CONTACT FORM WIDTH
+   Controls the width of the contact form.
+   ========================================================= */
+
+#contactForm {
+    max-width: 600px;
+    margin: 20px auto;
+}
+
+
+/* =========================================================
+   EXTRA 05. FORM STATUS MESSAGE
+   Displays validation and success messages.
+   ========================================================= */
+
+#formStatus {
+    margin-top: 15px;
+    font-weight: 600;
+}
 
 /* =========================================================
    END OF STYLES.CSS
