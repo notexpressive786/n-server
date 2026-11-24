@@ -1,1 +1,506 @@
 
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Make the page responsive on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Page title -->
+    <title>Study Materials | School</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome icons -->
+    <link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+
+        /* ================================
+           1. GLOBAL PAGE STYLING
+        ================================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f7fc;
+            color: #26344a;
+        }
+
+        /* Main page container */
+        .container {
+            max-width: 1150px;
+            margin: auto;
+            padding: 30px 20px;
+        }
+
+
+        /* ================================
+           2. HEADER SECTION
+        ================================= */
+
+        .header {
+            background: linear-gradient(135deg, #163b70, #2475bd);
+            color: white;
+            padding: 45px 25px;
+            text-align: center;
+            border-radius: 18px;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .header i {
+            font-size: 38px;
+            margin-bottom: 15px;
+        }
+
+
+        /* ================================
+           3. SEARCH AND FILTER SECTION
+        ================================= */
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filters input,
+        .filters select {
+            padding: 13px;
+            border: 1px solid #dce3ed;
+            border-radius: 9px;
+            font-family: inherit;
+            background: white;
+            font-size: 14px;
+        }
+
+        .filters input {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filters select {
+            min-width: 150px;
+        }
+
+
+        /* ================================
+           4. MATERIAL GRID
+        ================================= */
+
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 20px;
+        }
+
+        /* Individual material card */
+        .material-card {
+            background: white;
+            padding: 22px;
+            border-radius: 13px;
+            border: 1px solid #e7edf5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+            transition: 0.3s;
+        }
+
+        .material-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.09);
+        }
+
+        /* PDF icon */
+        .pdf-icon {
+            width: 52px;
+            height: 52px;
+            background: #fff0ef;
+            color: #e34b46;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 25px;
+            margin-bottom: 15px;
+        }
+
+        /* Material title */
+        .material-card h3 {
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+
+        /* Material description */
+        .material-card p {
+            color: #7b8797;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        /* Class and subject labels */
+        .tag {
+            display: inline-block;
+            background: #edf4ff;
+            color: #2464a5;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            margin: 3px 3px 12px 0;
+        }
+
+
+        /* ================================
+           5. DOWNLOAD BUTTON
+        ================================= */
+
+        .download-btn {
+            display: block;
+            text-align: center;
+            background: #1768b5;
+            color: white;
+            padding: 11px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #104b88;
+        }
+
+        .download-btn i {
+            margin-right: 7px;
+        }
+
+
+        /* ================================
+           6. EMPTY SEARCH MESSAGE
+        ================================= */
+
+        .no-results {
+            display: none;
+            text-align: center;
+            padding: 40px;
+            color: #7b8797;
+            grid-column: 1 / -1;
+        }
+
+
+        /* ================================
+           7. FOOTER
+        ================================= */
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #8793a3;
+            font-size: 13px;
+            margin-top: 30px;
+        }
+
+
+        /* ================================
+           8. MOBILE RESPONSIVENESS
+        ================================= */
+
+        @media (max-width: 600px) {
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .container {
+                padding: 20px 12px;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filters input,
+            .filters select {
+                width: 100%;
+            }
+
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- ================================
+         MAIN CONTAINER
+    ================================= -->
+
+    <div class="container">
+
+
+        <!-- ================================
+             PAGE HEADER
+        ================================= -->
+
+        <section class="header">
+
+            <i class="fas fa-book-open"></i>
+
+            <h1>Study Materials</h1>
+
+            <p>
+                Access your study notes, assignments,
+                question papers and learning resources.
+            </p>
+
+        </section>
+
+
+        <!-- ================================
+             SEARCH AND FILTERS
+        ================================= -->
+
+        <div class="filters">
+
+            <!-- Search materials by their name -->
+            <input
+                type="text"
+                id="searchInput"
+                placeholder="Search study materials..."
+            >
+
+            <!-- Filter materials by class -->
+            <select id="classFilter">
+                <option value="">All Classes</option>
+                <option value="Class 9">Class 9</option>
+                <option value="Class 10">Class 10</option>
+                <option value="Class 11">Class 11</option>
+                <option value="Class 12">Class 12</option>
+            </select>
+
+            <!-- Filter materials by subject -->
+            <select id="subjectFilter">
+                <option value="">All Subjects</option>
+                <option value="Mathematics">Mathematics</option>
+                <option value="Science">Science</option>
+                <option value="English">English</option>
+                <option value="Social Science">Social Science</option>
+            </select>
+
+        </div>
+
+
+        <!-- ================================
+             MATERIAL CARDS CONTAINER
+        ================================= -->
+
+        <div class="material-grid" id="materialGrid">
+
+            <!-- Material cards will be generated using JavaScript -->
+
+            <div class="no-results" id="noResults">
+                <i class="fas fa-folder-open"></i>
+                <p>No study materials found.</p>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================================
+         FOOTER
+    ================================= -->
+
+    <footer>
+        © 2026 Emmanuel English Medium Higher Sec School
+        <br>
+        Learning Resources for Students
+    </footer>
+
+
+    <!-- ================================
+         JAVASCRIPT: MATERIAL DATABASE
+         
+         TO ADD A NEW PDF:
+         1. Put the PDF inside materials/pdf/
+         2. Add its name in this list.
+         3. Enter its class and subject.
+         4. Save the file.
+    ================================= -->
+
+    <script>
+
+        // All available study materials are stored here.
+        const materials = [
+
+            {
+                name: "Mathematics Notes",
+                description: "Complete mathematics study notes.",
+                class: "Class 10",
+                subject: "Mathematics",
+                file: "materials/pdf/Class-10-Maths.pdf"
+            },
+
+            {
+                name: "Science Notes",
+                description: "Science notes and important questions.",
+                class: "Class 10",
+                subject: "Science",
+                file: "materials/pdf/Class-10-Science.pdf"
+            },
+
+            {
+                name: "English Study Material",
+                description: "English grammar and chapter notes.",
+                class: "Class 10",
+                subject: "English",
+                file: "materials/pdf/English-Notes.pdf"
+            }
+
+        ];
+
+
+        // ================================
+        // DISPLAY ALL MATERIAL CARDS
+        // ================================
+
+        function displayMaterials() {
+
+            // Get the material container
+            const grid = document.getElementById("materialGrid");
+
+            // Clear previous cards but retain the empty message
+            grid.querySelectorAll(".material-card").forEach(card => card.remove());
+
+            // Read current search and filter values
+            const search = document.getElementById("searchInput").value.toLowerCase();
+            const selectedClass = document.getElementById("classFilter").value;
+            const selectedSubject = document.getElementById("subjectFilter").value;
+
+            // Filter materials according to the selected options
+            const filteredMaterials = materials.filter(item => {
+
+                const matchesSearch =
+                    item.name.toLowerCase().includes(search) ||
+                    item.description.toLowerCase().includes(search);
+
+                const matchesClass =
+                    selectedClass === "" || item.class === selectedClass;
+
+                const matchesSubject =
+                    selectedSubject === "" || item.subject === selectedSubject;
+
+                return matchesSearch && matchesClass && matchesSubject;
+
+            });
+
+
+            // Show a message if no material matches
+            document.getElementById("noResults").style.display =
+                filteredMaterials.length === 0 ? "block" : "none";
+
+
+            // Generate individual PDF cards
+            filteredMaterials.forEach(item => {
+
+                const card = document.createElement("div");
+
+                card.className = "material-card";
+
+                // Build the material card
+                card.innerHTML = `
+
+                    <div class="pdf-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+
+                    <h3>${escapeHTML(item.name)}</h3>
+
+                    <p>${escapeHTML(item.description)}</p>
+
+                    <span class="tag">${escapeHTML(item.class)}</span>
+
+                    <span class="tag">${escapeHTML(item.subject)}</span>
+
+                    <a href="${escapeHTML(item.file)}"
+                       class="download-btn"
+                       download>
+
+                        <i class="fas fa-download"></i>
+                        Download PDF
+
+                    </a>
+
+                `;
+
+                grid.appendChild(card);
+
+            });
+
+        }
+
+
+        // ================================
+        // SAFELY DISPLAY USER-EDITABLE TEXT
+        // ================================
+
+        function escapeHTML(value) {
+
+            return String(value).replace(/[&<>"']/g, character => ({
+                "&": "&amp;",
+                "<": "&lt;",
+                ">": "&gt;",
+                '"': "&quot;",
+                "'": "&#39;"
+            })[character]);
+
+        }
+
+
+        // ================================
+        // SEARCH AND FILTER EVENT LISTENERS
+        // ================================
+
+        document.getElementById("searchInput")
+            .addEventListener("input", displayMaterials);
+
+        document.getElementById("classFilter")
+            .addEventListener("change", displayMaterials);
+
+        document.getElementById("subjectFilter")
+            .addEventListener("change", displayMaterials);
+
+
+        // ================================
+        // LOAD MATERIALS WHEN PAGE OPENS
+        // ================================
+
+        displayMaterials();
+
+    </script>
+
+</body>
+</html>
+
