@@ -1,735 +1,413 @@
-/* This is a CSS comment.
-   It explains what the code below does.
-   Comments do not affect the website design. */
-
-body {
-    background-color: white; /* Sets the website background to white */
-}
-
-
-
-/* =========================================================
-   PROJECT NAME: MY WEBSITE
-   FILE NAME: styles.css
-   LANGUAGE: CSS (Cascading Style Sheets)
-
-   PURPOSE:
-   This file controls the complete visual appearance of
-   the website, including colors, fonts, spacing, layouts,
-   buttons, navigation, images, animations and responsiveness.
-
-   HOW TO USE:
-   1. Create a file named styles.css.
-   2. Link it to your HTML file.
-   3. Write all website styling in this file.
-   4. Use /* comments */ to explain your code.
-
-   CSS SYNTAX:
-   selector {
-       property: value;
-   }
-
-   ========================================================= */
-
-
-/* =========================================================
-   01. CSS RESET
-   Removes default browser spacing and standardizes elements.
-   ========================================================= */
-
-* {
-    margin: 0;                 /* Removes default outer spacing */
-    padding: 0;                /* Removes default inner spacing */
-    box-sizing: border-box;    /* Includes padding and border in element width */
-}
-
-html {
-    scroll-behavior: smooth;   /* Makes page scrolling smooth */
-}
-
-body {
-    min-height: 100vh;         /* Makes body at least screen height */
-    font-family: Arial, sans-serif; /* Sets default font */
-    line-height: 1.6;          /* Controls spacing between text lines */
-    overflow-x: hidden;        /* Prevents horizontal page overflow */
-}
-
-
-/* =========================================================
-   02. ROOT VARIABLES
-   Stores reusable colors, sizes and design values.
-   Change values here to update the entire website.
-   ========================================================= */
-
+/* ==========================================================================
+   ExamShelf — tokens
+   ========================================================================== */
 :root {
-    /* Website color palette */
-    --primary-color: #2563eb;       /* Main website color */
-    --secondary-color: #1e40af;     /* Secondary color */
-    --accent-color: #f59e0b;        /* Highlight color */
-    --background-color: #ffffff;    /* Main background */
-    --surface-color: #f3f4f6;       /* Card and section background */
-    --text-color: #222222;          /* Main text color */
-    --muted-color: #666666;         /* Secondary text color */
-    --border-color: #dddddd;        /* Border color */
+  --navy: #1b2a4a;
+  --navy-deep: #121d35;
+  --gold: #c7912f;
+  --gold-soft: #eddfc2;
+  --paper: #f7f5f0;
+  --paper-raised: #ffffff;
+  --ink: #26241f;
+  --ink-soft: #5b584e;
+  --line: #e3ddcf;
+  --focus: #1b2a4a;
 
-    /* Font sizes */
-    --small-font: 14px;
-    --normal-font: 16px;
-    --large-font: 24px;
-    --heading-font: 40px;
+  --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-    /* Spacing values */
-    --space-small: 8px;
-    --space-medium: 16px;
-    --space-large: 32px;
-
-    /* Design settings */
-    --border-radius: 10px;
-    --container-width: 1200px;
-
-    /* Shadow settings */
-    --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-    /* Transition speed */
-    --transition-speed: 0.3s;
+  --shell-width: 1080px;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --navy: #c7d3ec;
+    --navy-deep: #eef2fa;
+    --gold: #e8bb6b;
+    --gold-soft: #3a3120;
+    --paper: #171511;
+    --paper-raised: #201d17;
+    --ink: #ece7db;
+    --ink-soft: #b7b0a0;
+    --line: #38342a;
+    --focus: #e8bb6b;
+  }
+}
+:root[data-theme="dark"] {
+  --navy: #c7d3ec;
+  --navy-deep: #eef2fa;
+  --gold: #e8bb6b;
+  --gold-soft: #3a3120;
+  --paper: #171511;
+  --paper-raised: #201d17;
+  --ink: #ece7db;
+  --ink-soft: #b7b0a0;
+  --line: #38342a;
+  --focus: #e8bb6b;
+}
 
-/* =========================================================
-   03. BODY AND MAIN PAGE
-   Controls the general appearance of the website.
-   ========================================================= */
-
+/* ==========================================================================
+   Reset & base
+   ========================================================================== */
+* { box-sizing: border-box; }
+html { color-scheme: light dark; }
 body {
-    background-color: var(--background-color);
-    color: var(--text-color);
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
 }
 
-
-/* =========================================================
-   04. HEADINGS
-   Styles all heading elements from H1 to H6.
-   ========================================================= */
-
-h1 {
-    font-size: var(--heading-font); /* Main heading size */
-    font-weight: 700;               /* Makes heading bold */
-    line-height: 1.2;               /* Controls heading line height */
-    margin-bottom: 20px;            /* Space below heading */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  color: var(--navy);
+  margin: 0;
+  line-height: 1.15;
 }
-
-h2 {
-    font-size: 32px;
-    font-weight: 600;
-    margin-bottom: 16px;
-}
-
-h3 {
-    font-size: 24px;
-    font-weight: 600;
-    margin-bottom: 12px;
-}
-
-h4 {
-    font-size: 20px;
-}
-
-h5 {
-    font-size: 18px;
-}
-
-h6 {
-    font-size: 16px;
-}
-
-
-/* =========================================================
-   05. PARAGRAPHS AND TEXT
-   Controls paragraph appearance and readability.
-   ========================================================= */
-
-p {
-    font-size: var(--normal-font);
-    color: var(--muted-color);
-    line-height: 1.8;
-    margin-bottom: 15px;
-}
-
-
-/* =========================================================
-   06. LINKS
-   Controls hyperlinks and their hover appearance.
-   ========================================================= */
 
 a {
-    color: var(--primary-color);
-    text-decoration: none;       /* Removes default underline */
-    transition: color var(--transition-speed);
+  color: inherit;
+  text-decoration: none;
 }
 
-a:hover {
-    color: var(--secondary-color);
+button {
+  font-family: inherit;
+  cursor: pointer;
 }
 
-a:focus-visible {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 3px;
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
 }
 
-
-/* =========================================================
-   07. IMAGES AND MEDIA
-   Makes images responsive and prevents unwanted overflow.
-   ========================================================= */
-
-img {
-    max-width: 100%;             /* Prevents image overflow */
-    height: auto;                /* Maintains image proportions */
-    display: block;              /* Removes inline image gap */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }
 
-video {
-    max-width: 100%;
-    height: auto;
+.shell {
+  max-width: var(--shell-width);
+  margin: 0 auto;
+  padding: 0 1.75rem;
 }
 
-iframe {
-    max-width: 100%;
+.muted { color: var(--ink-soft); }
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
 }
 
-
-/* =========================================================
-   08. MAIN CONTAINER
-   Keeps website content centered and controls its width.
-   ========================================================= */
-
-.container {
-    width: 90%;
-    max-width: var(--container-width);
-    margin-left: auto;           /* Centers container horizontally */
-    margin-right: auto;
+/* ==========================================================================
+   Header
+   ========================================================================== */
+.site-header {
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
-
-/* =========================================================
-   09. HEADER
-   Styles the top section of the website.
-   ========================================================= */
-
-header {
-    width: 100%;
-    background-color: var(--background-color);
-    padding: 15px 0;
-    box-shadow: var(--box-shadow);
-    position: relative;
-    z-index: 100;
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
 }
 
+.brand {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: var(--navy);
+  letter-spacing: -0.01em;
+}
+.brand span { color: var(--gold); }
 
-/* =========================================================
-   10. NAVIGATION BAR
-   Creates a horizontal navigation menu.
-   ========================================================= */
+.main-nav {
+  display: flex;
+  gap: 2rem;
+}
+.main-nav a {
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+  border-bottom: 2px solid transparent;
+  padding: 0.3rem 0;
+}
+.main-nav a:hover { color: var(--navy); border-color: var(--gold); }
 
-.navbar {
-    display: flex;               /* Activates Flexbox */
-    justify-content: space-between; /* Spreads items horizontally */
-    align-items: center;         /* Vertically aligns items */
-    gap: 20px;
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 0.5rem;
+}
+.nav-toggle span {
+  width: 22px;
+  height: 2px;
+  background: var(--navy);
+  display: block;
 }
 
-.logo {
-    font-size: 26px;
-    font-weight: bold;
-    color: var(--primary-color);
-}
-
-.nav-links {
-    display: flex;
-    align-items: center;
-    gap: 25px;
-    list-style: none;            /* Removes bullet points */
-}
-
-.nav-links a {
-    color: var(--text-color);
-    font-weight: 500;
-}
-
-.nav-links a:hover {
-    color: var(--primary-color);
-}
-
-
-/* =========================================================
-   11. HERO SECTION
-   Styles the main introductory section of the website.
-   ========================================================= */
-
+/* ==========================================================================
+   Hero
+   ========================================================================== */
 .hero {
-    min-height: 500px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    padding: 60px 20px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 3rem;
+  align-items: end;
+  padding-top: 4rem;
+  padding-bottom: 3rem;
+}
 
-    background: linear-gradient(
-        135deg,
-        #dbeafe,
-        #eff6ff
-    );
+.kicker {
+  font-size: 0.95rem;
+  color: var(--gold);
+  margin: 0 0 0.75rem;
+  font-style: italic;
+  font-family: var(--font-display);
 }
 
 .hero h1 {
-    color: var(--text-color);
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  max-width: 16ch;
+  margin-bottom: 1.1rem;
 }
 
-.hero p {
-    max-width: 650px;
-    margin: 0 auto 25px;
+.lede {
+  max-width: 48ch;
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin: 0 0 2rem;
 }
 
+.search-row {
+  display: flex;
+  max-width: 480px;
+  border: 1px solid var(--navy);
+  background: var(--paper-raised);
+}
+.search-row input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.85rem 1rem;
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+.search-row input::placeholder { color: var(--ink-soft); }
+.search-row input:focus { outline: none; }
+.search-row button {
+  border: none;
+  background: var(--navy);
+  color: var(--paper);
+  padding: 0 1.5rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+.search-row button:hover { background: var(--navy-deep); }
 
-/* =========================================================
-   12. BUTTONS
-   Creates reusable button styles for the website.
-   ========================================================= */
-
-.btn {
-    display: inline-block;
-    padding: 12px 25px;
-    border: none;
-    border-radius: var(--border-radius);
-    background-color: var(--primary-color);
-    color: white;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all var(--transition-speed);
+.hero-stats {
+  display: flex;
+  gap: 2.25rem;
+  margin: 0;
+  padding-bottom: 0.4rem;
+  border-left: 1px solid var(--line);
+  padding-left: 2.25rem;
+}
+.hero-stats > div { display: flex; flex-direction: column; gap: 0.2rem; }
+.hero-stats dt {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--navy);
+  font-weight: 600;
+}
+.hero-stats dd {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  max-width: 10ch;
 }
 
-.btn:hover {
-    background-color: var(--secondary-color);
-    transform: translateY(-3px);
+/* ==========================================================================
+   Browse pills
+   ========================================================================== */
+.browse { padding: 2.5rem 1.75rem; border-top: 1px solid var(--line); }
+.browse h2 { font-size: 1.3rem; margin-bottom: 1.1rem; }
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.pill {
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  color: var(--ink-soft);
+  padding: 0.5rem 1.05rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+.pill:hover { border-color: var(--navy); color: var(--navy); }
+.pill.is-active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: var(--paper);
 }
 
-.btn:active {
-    transform: translateY(0);
+/* ==========================================================================
+   Catalog
+   ========================================================================== */
+.catalog { padding: 2.5rem 1.75rem 3.5rem; border-top: 1px solid var(--line); }
+
+.catalog-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+.catalog-head h2 { font-size: 1.3rem; }
+.catalog-head p { font-size: 0.9rem; }
+
+.catalog-table {
+  border-top: 1px solid var(--navy);
+}
+.row {
+  display: grid;
+  grid-template-columns: 2.4fr 1fr 1fr 0.6fr 0.7fr 0.9fr;
+  gap: 1rem;
+  align-items: center;
+  padding: 0.95rem 0.25rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.92rem;
+}
+.row.head {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--navy);
+  padding-bottom: 0.6rem;
+}
+.row:not(.head):hover { background: var(--paper-raised); }
+
+.title { color: var(--ink); font-weight: 500; }
+
+.tag {
+  display: inline-block;
+  font-size: 0.78rem;
+  color: var(--navy);
+  background: var(--gold-soft);
+  border-radius: 3px;
+  padding: 0.15rem 0.55rem;
 }
 
-.btn:focus-visible {
-    outline: 3px solid var(--accent-color);
-    outline-offset: 3px;
+.dl {
+  color: var(--navy);
+  font-weight: 600;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--gold);
+}
+.dl:hover { color: var(--gold); }
+
+.empty-state {
+  padding: 2.5rem 0;
+  text-align: center;
+  color: var(--ink-soft);
 }
 
+/* ==========================================================================
+   Contribute
+   ========================================================================== */
+.contribute { padding: 1rem 1.75rem 4rem; }
+.contribute-box {
+  border: 1px solid var(--line);
+  background: var(--paper-raised);
+  padding: 2.5rem;
+  display: grid;
+  gap: 1rem;
+  max-width: 640px;
+}
+.contribute-box h2 { font-size: 1.5rem; }
+.contribute-box p { color: var(--ink-soft); margin: 0; }
 
-/* =========================================================
-   13. FLEXBOX LAYOUT
-   Arranges elements in rows or columns.
-   ========================================================= */
+.btn-primary {
+  display: inline-block;
+  width: fit-content;
+  background: var(--navy);
+  color: var(--paper);
+  padding: 0.8rem 1.6rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.btn-primary:hover { background: var(--gold); color: var(--navy-deep); }
 
-.flex {
-    display: flex;
-    align-items: center;
-    gap: 20px;
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+.site-footer {
+  border-top: 1px solid var(--line);
+  padding: 1.75rem 0;
+}
+.footer-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
 }
 
-.flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+@media (max-width: 860px) {
+  .hero {
+    grid-template-columns: 1fr;
+    padding-top: 2.5rem;
+  }
+  .hero-stats {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid var(--line);
+    padding-top: 1.25rem;
+  }
+  .row {
+    grid-template-columns: 1fr;
+    gap: 0.3rem;
+    padding: 1rem 0.25rem;
+  }
+  .row.head { display: none; }
+  .row:not(.head) .title { font-weight: 600; }
+  .row:not(.head) span:not(.title)::before {
+    content: attr(data-label);
+  }
 }
 
-.flex-between {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.flex-wrap {
-    flex-wrap: wrap;
-}
-
-
-/* =========================================================
-   14. GRID LAYOUT
-   Creates responsive rows and columns.
-   ========================================================= */
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 25px;
-}
-
-
-/* =========================================================
-   15. CARDS
-   Creates reusable boxes for products, services and content.
-   ========================================================= */
-
-.card {
-    background-color: var(--background-color);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    padding: 25px;
-    box-shadow: var(--box-shadow);
-    transition: transform var(--transition-speed);
-}
-
-.card:hover {
-    transform: translateY(-5px);
-}
-
-
-/* =========================================================
-   16. FORMS AND INPUT FIELDS
-   Styles text fields, email fields and text areas.
-   ========================================================= */
-
-input,
-textarea,
-select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 6px;
-    font-family: inherit;
-    font-size: 16px;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-
-/* =========================================================
-   17. LISTS
-   Controls ordered and unordered lists.
-   ========================================================= */
-
-ul,
-ol {
-    padding-left: 25px;
-    margin-bottom: 15px;
-}
-
-li {
-    margin-bottom: 8px;
-}
-
-
-/* =========================================================
-   18. FOOTER
-   Styles the bottom section of the website.
-   ========================================================= */
-
-footer {
-    background-color: #111827;
-    color: white;
-    text-align: center;
-    padding: 40px 20px;
-}
-
-footer p {
-    color: #d1d5db;
-}
-
-
-/* =========================================================
-   19. POSITIONING
-   Controls the position of website elements.
-   ========================================================= */
-
-.relative {
-    position: relative;
-}
-
-.absolute {
+@media (max-width: 720px) {
+  .main-nav {
     position: absolute;
-}
-
-.fixed {
-    position: fixed;
-}
-
-.sticky {
-    position: sticky;
-    top: 0;
-}
-
-
-/* =========================================================
-   20. OVERFLOW
-   Controls content that exceeds an element's boundaries.
-   ========================================================= */
-
-.overflow-hidden {
-    overflow: hidden;
-}
-
-.overflow-auto {
-    overflow: auto;
-}
-
-
-/* =========================================================
-   21. SHADOWS AND ROUNDED CORNERS
-   Adds depth and smooth edges to website elements.
-   ========================================================= */
-
-.shadow {
-    box-shadow: var(--box-shadow);
-}
-
-.rounded {
-    border-radius: var(--border-radius);
-}
-
-.rounded-full {
-    border-radius: 50%;
-}
-
-
-/* =========================================================
-   22. TRANSITIONS AND ANIMATIONS
-   Adds smooth movement and visual effects.
-   ========================================================= */
-
-.transition {
-    transition: all var(--transition-speed) ease;
-}
-
-/* Simple fade-in animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;               /* Starts invisible */
-    }
-
-    to {
-        opacity: 1;               /* Ends fully visible */
-    }
-}
-
-.fade-in {
-    animation: fadeIn 1s ease;
-}
-
-
-/* =========================================================
-   23. UTILITY CLASSES
-   Small reusable classes for common styling tasks.
-   ========================================================= */
-
-.text-center {
-    text-align: center;
-}
-
-.text-left {
-    text-align: left;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-bold {
-    font-weight: bold;
-}
-
-.text-uppercase {
-    text-transform: uppercase;
-}
-
-.hidden {
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+    flex-direction: column;
+    gap: 0;
+    padding: 0.5rem 1.75rem;
     display: none;
+  }
+  .main-nav.is-open { display: flex; }
+  .main-nav a { padding: 0.75rem 0; border-bottom: 1px solid var(--line); }
+  .nav-toggle { display: flex; }
 }
-
-.w-100 {
-    width: 100%;
-}
-
-.m-auto {
-    margin: auto;
-}
-
-
-/* =========================================================
-   24. RESPONSIVE DESIGN - TABLETS
-   Changes the layout on medium-sized screens.
-   ========================================================= */
-
-@media screen and (max-width: 992px) {
-
-    .grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    h1 {
-        font-size: 34px;
-    }
-
-    .nav-links {
-        gap: 15px;
-    }
-}
-
-
-/* =========================================================
-   25. RESPONSIVE DESIGN - MOBILE PHONES
-   Adjusts the website for smaller screens.
-   ========================================================= */
-
-@media screen and (max-width: 600px) {
-
-    .container {
-        width: 95%;
-    }
-
-    h1 {
-        font-size: 28px;
-    }
-
-    h2 {
-        font-size: 24px;
-    }
-
-    .navbar {
-        flex-direction: column;
-    }
-
-    .nav-links {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .grid {
-        grid-template-columns: 1fr;
-    }
-
-    .hero {
-        min-height: 350px;
-        padding: 40px 15px;
-    }
-
-    .btn {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-
-/* =========================================================
-   26. ACCESSIBILITY
-   Respects the user's reduced-motion preference.
-   ========================================================= */
-
-@media (prefers-reduced-motion: reduce) {
-
-    *,
-    *::before,
-    *::after {
-        scroll-behavior: auto !important;
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
-}
-
-/* =========================================================
-   EXTRA 01. MOBILE MENU BUTTON
-   Styles the navigation toggle button.
-   ========================================================= */
-
-.menu-toggle {
-    display: none;               /* Hidden on desktop */
-    background: none;
-    border: none;
-    font-size: 28px;
-    cursor: pointer;
-    color: var(--primary-color);
-}
-
-
-/* =========================================================
-   EXTRA 02. NAVIGATION MENU STATES
-   Controls the mobile menu visibility.
-   ========================================================= */
-
-@media screen and (max-width: 600px) {
-
-    .menu-toggle {
-        display: block;          /* Shows button on mobile */
-    }
-
-    .navbar {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    .nav-links {
-        display: none;           /* Hides menu initially */
-        width: 100%;
-        padding: 15px 0;
-    }
-
-    .nav-links.active {
-        display: flex;           /* Shows menu when opened */
-    }
-
-}
-
-
-/* =========================================================
-   EXTRA 03. FORM LABELS
-   Makes form labels readable.
-   ========================================================= */
-
-label {
-    display: block;
-    margin-bottom: 6px;
-    font-weight: 600;
-}
-
-
-/* =========================================================
-   EXTRA 04. CONTACT FORM WIDTH
-   Controls the width of the contact form.
-   ========================================================= */
-
-#contactForm {
-    max-width: 600px;
-    margin: 20px auto;
-}
-
-
-/* =========================================================
-   EXTRA 05. FORM STATUS MESSAGE
-   Displays validation and success messages.
-   ========================================================= */
-
-#formStatus {
-    margin-top: 15px;
-    font-weight: 600;
-}
-
-/* =========================================================
-   END OF STYLES.CSS
-
-   All website styling should be written above this line.
-   Add new sections with comments to keep your code organized.
-
-   ========================================================= */
-
-
