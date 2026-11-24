@@ -1,100 +1,193 @@
+
+/* =========================================================
+   WEBSITE MAIN SCRIPT.JS
+   ---------------------------------------------------------
+   PART 1: MATERIAL SEARCH AND FILTER
+   PART 2: MOBILE NAVIGATION
+   PART 3: PHOTO COLLAGE MAKER
+
+   All features are initialized safely.
+========================================================= */
+
+
+/* =========================================================
+   PART 1: MATERIAL SEARCH AND EXAM FILTERS
+========================================================= */
+
 (function () {
-  const pills = document.querySelectorAll('.pill');
-  const rows = document.querySelectorAll('.catalog-table .row:not(.head)');
-  const resultCount = document.getElementById('resultCount');
-  const emptyState = document.getElementById('emptyState');
-  const searchInput = document.getElementById('searchInput');
-  const searchForm = document.getElementById('searchForm');
-  const navToggle = document.getElementById('navToggle');
-  const mainNav = document.querySelector('.main-nav');
 
-  let activeExam = 'all';
+    // Get website elements.
+    const pills = document.querySelectorAll('.pill');
+    const rows = document.querySelectorAll('.catalog-table .row:not(.head)');
+    const resultCount = document.getElementById('resultCount');
+    const emptyState = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
 
-  function applyFilters() {
-    const query = searchInput.value.trim().toLowerCase();
-    let visible = 0;
+    // Track currently selected exam.
+    let activeExam = 'all';
 
-    rows.forEach((row) => {
-      const matchesExam = activeExam === 'all' || row.dataset.exam === activeExam;
-      const matchesQuery = !query || row.textContent.toLowerCase().includes(query);
-      const show = matchesExam && matchesQuery;
-      row.style.display = show ? '' : 'none';
-      if (show) visible += 1;
+    // Apply search and exam filters.
+    function applyFilters() {
+
+        // Stop safely if search elements are unavailable.
+        if (!searchInput || !resultCount || !emptyState) return;
+
+        const query = searchInput.value.trim().toLowerCase();
+
+        let visible = 0;
+
+        rows.forEach((row) => {
+
+            const matchesExam =
+                activeExam === 'all' ||
+                row.dataset.exam === activeExam;
+
+            const matchesQuery =
+                !query ||
+                row.textContent.toLowerCase().includes(query);
+
+            const show = matchesExam && matchesQuery;
+
+            row.style.display = show ? '' : 'none';
+
+            if (show) visible++;
+
+        });
+
+        // Update result count.
+        resultCount.textContent =
+            visible + (visible === 1 ? ' document' : ' documents');
+
+        // Display empty state when no results exist.
+        emptyState.hidden = visible !== 0;
+
+    }
+
+    // Handle exam filter buttons.
+    pills.forEach((pill) => {
+
+        pill.addEventListener('click', () => {
+
+            pills.forEach((p) =>
+                p.classList.remove('is-active')
+            );
+
+            pill.classList.add('is-active');
+
+            activeExam = pill.dataset.exam;
+
+            applyFilters();
+
+        });
+
     });
 
-    resultCount.textContent = visible + (visible === 1 ? ' document' : ' documents');
-    emptyState.hidden = visible !== 0;
-  }
+    // Handle search form submission.
+    if (searchForm) {
 
-  pills.forEach((pill) => {
-    pill.addEventListener('click', () => {
-      pills.forEach((p) => p.classList.remove('is-active'));
-      pill.classList.add('is-active');
-      activeExam = pill.dataset.exam;
-      applyFilters();
-    });
-  });
+        searchForm.addEventListener('submit', (e) => {
 
-  searchForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    applyFilters();
-  });
-  searchInput.addEventListener('input', applyFilters);
+            e.preventDefault();
 
-  navToggle.addEventListener('click', () => {
-    const open = mainNav.classList.toggle('is-open');
-    navToggle.setAttribute('aria-expanded', open);
-  });
+            applyFilters();
+
+        });
+
+    }
+
+    // Update results while typing.
+    if (searchInput) {
+
+        searchInput.addEventListener('input', applyFilters);
+
+    }
+
 })();
 
 
-
 /* =========================================================
-   PHOTO COLLAGE MAKER - SCRIPT.JS
-   ---------------------------------------------------------
-   Features:
-   1. Select multiple photos (maximum 10).
-   2. Automatic landscape collage arrangement.
-   3. Equal grid and automatic layouts.
-   4. Remove individual photos.
-   5. HD 1920 x 1080 collage generation.
-   6. PNG download.
-   7. Drag and drop image upload.
-   8. Automatic preview updates.
+   PART 2: MOBILE NAVIGATION
 ========================================================= */
 
+(function () {
+
+    // Find navigation elements.
+    const navToggle = document.getElementById('navToggle');
+    const mainNav = document.querySelector('.main-nav');
+
+    // Only initialize when both elements exist.
+    if (!navToggle || !mainNav) return;
+
+    // Toggle mobile navigation.
+    navToggle.addEventListener('click', () => {
+
+        const open = mainNav.classList.toggle('is-open');
+
+        navToggle.setAttribute('aria-expanded', String(open));
+
+    });
+
+})();
+
 
 /* =========================================================
-   1. INITIALIZE COLLAGE MAKER
+   PART 3: PHOTO COLLAGE MAKER
 ========================================================= */
 
-document.addEventListener("DOMContentLoaded", function () {
+(function () {
 
-    // Find all required HTML elements.
-    const cmInput = document.getElementById("cm-file-input");
-    const cmPhotoList = document.getElementById("cm-photo-list");
-    const cmPhotoCount = document.getElementById("cm-photo-count");
-    const cmCanvas = document.getElementById("cm-canvas");
-    const cmGenerate = document.getElementById("cm-generate");
-    const cmDownload = document.getElementById("cm-download");
-    const cmStatus = document.getElementById("cm-status");
-    const cmDropArea = document.getElementById("cm-drop-area");
+    /* -----------------------------------------------------
+       1. INITIALIZE COLLAGE ELEMENTS
+    ----------------------------------------------------- */
 
-    // Stop initialization if the collage section is not on this page.
+    const cmInput = document.getElementById('cm-file-input');
+    const cmPhotoList = document.getElementById('cm-photo-list');
+    const cmPhotoCount = document.getElementById('cm-photo-count');
+    const cmCanvas = document.getElementById('cm-canvas');
+    const cmGenerate = document.getElementById('cm-generate');
+    const cmDownload = document.getElementById('cm-download');
+    const cmStatus = document.getElementById('cm-status');
+    const cmDropArea = document.getElementById('cm-drop-area');
+
+    // Collage settings.
+    const cmLayout = document.getElementById('cm-layout');
+    const cmGap = document.getElementById('cm-gap');
+    const cmBackground = document.getElementById('cm-background');
+
+    // Make sure all essential HTML elements exist.
     if (
         !cmInput ||
         !cmPhotoList ||
+        !cmPhotoCount ||
         !cmCanvas ||
         !cmGenerate ||
         !cmDownload ||
         !cmStatus ||
-        !cmDropArea
+        !cmDropArea ||
+        !cmLayout ||
+        !cmGap ||
+        !cmBackground
     ) {
+
+        console.warn(
+            'Collage Maker: Required HTML element is missing. Check your element IDs.'
+        );
+
         return;
+
     }
 
-    // Get the 2D drawing context of the canvas.
-    const cmCtx = cmCanvas.getContext("2d");
+    // Get canvas drawing context.
+    const cmCtx = cmCanvas.getContext('2d');
+
+    if (!cmCtx) {
+
+        console.error('Collage Maker: Canvas is not supported.');
+
+        return;
+
+    }
 
     // Store uploaded photos.
     let cmPhotos = [];
@@ -102,76 +195,87 @@ document.addEventListener("DOMContentLoaded", function () {
     // Maximum number of photos.
     const CM_MAX_PHOTOS = 10;
 
+    // Prevent older collage generation from replacing a newer one.
+    let cmGenerationId = 0;
 
-    /* =====================================================
-       2. HANDLE PHOTO SELECTION
-    ===================================================== */
+    // Set action buttons to avoid accidental form submission.
+    cmGenerate.type = 'button';
+    cmDownload.type = 'button';
 
-    cmInput.addEventListener("change", function (event) {
 
-        // Add selected images to the collage.
+    /* -----------------------------------------------------
+       2. HANDLE PHOTO UPLOAD
+    ----------------------------------------------------- */
+
+    cmInput.addEventListener('change', function (event) {
+
         addPhotos(event.target.files);
 
-        // Reset input to allow selecting the same images again.
-        cmInput.value = "";
+        // Reset input.
+        cmInput.value = '';
 
     });
 
 
-    /* =====================================================
-       3. ADD PHOTOS
-    ===================================================== */
+    /* -----------------------------------------------------
+       3. ADD PHOTOS TO COLLAGE
+    ----------------------------------------------------- */
 
     function addPhotos(files) {
 
-        // Filter only valid image files.
+        // Accept image files only.
         const imageFiles = Array.from(files).filter(file =>
-            file.type.startsWith("image/")
+            file.type.startsWith('image/')
         );
 
-        // Calculate remaining upload capacity.
+        // Calculate available photo slots.
         const available = CM_MAX_PHOTOS - cmPhotos.length;
 
-        // Stop if the maximum has already been reached.
         if (available <= 0) {
 
-            cmStatus.textContent = "Maximum 10 photos allowed.";
+            cmStatus.textContent = 'Maximum 10 photos allowed.';
 
             return;
 
         }
 
-        // Add only the number of images allowed.
+        // Select only allowed number of photos.
         const selected = imageFiles.slice(0, available);
 
-        // Create temporary URLs for uploaded images.
+        // Store image files.
         selected.forEach(file => {
 
-            const imageURL = URL.createObjectURL(file);
-
             cmPhotos.push({
+
                 file: file,
-                url: imageURL
+
+                url: URL.createObjectURL(file)
+
             });
 
         });
 
-        // Display upload information.
+        // Show upload information.
         if (imageFiles.length > available) {
 
             cmStatus.textContent =
-                "Only " + available + " additional photos were added.";
+                'Only ' + available + ' additional photos were added.';
+
+        } else if (selected.length === 0) {
+
+            cmStatus.textContent =
+                'Please select valid image files.';
 
         } else {
 
-            cmStatus.textContent = "";
+            cmStatus.textContent = '';
 
         }
 
         // Refresh photo thumbnails.
         renderPhotoList();
 
-        // Generate the collage automatically.
+        // Generate preview automatically.
         if (cmPhotos.length > 0) {
 
             generateCollage();
@@ -181,20 +285,18 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       4. DISPLAY PHOTO THUMBNAILS
-    ===================================================== */
+    /* -----------------------------------------------------
+       4. DISPLAY SELECTED PHOTO THUMBNAILS
+    ----------------------------------------------------- */
 
     function renderPhotoList() {
 
-        // Clear existing thumbnails.
-        cmPhotoList.innerHTML = "";
+        cmPhotoList.innerHTML = '';
 
-        // Update photo counter.
         cmPhotoCount.textContent =
-            cmPhotos.length + " / " + CM_MAX_PHOTOS;
+            cmPhotos.length + ' / ' + CM_MAX_PHOTOS;
 
-        // Show empty message if there are no photos.
+        // Display empty message.
         if (cmPhotos.length === 0) {
 
             cmPhotoList.innerHTML =
@@ -206,49 +308,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
         }
 
-        // Create thumbnail for every selected photo.
+        // Create individual thumbnails.
         cmPhotos.forEach((photo, index) => {
 
-            const item = document.createElement("div");
+            const item = document.createElement('div');
 
-            item.className = "cm-photo-item";
+            item.className = 'cm-photo-item';
 
-            // Create image thumbnail.
-            const img = document.createElement("img");
+            const img = document.createElement('img');
 
             img.src = photo.url;
 
-            img.alt = "Selected photo " + (index + 1);
+            img.alt = 'Selected photo ' + (index + 1);
 
             // Create remove button.
-            const remove = document.createElement("button");
+            const remove = document.createElement('button');
 
-            remove.className = "cm-remove";
+            remove.type = 'button';
 
-            remove.textContent = "×";
+            remove.className = 'cm-remove';
 
-            remove.title = "Remove photo";
+            remove.textContent = '×';
 
-            // Remove selected photo when clicked.
-            remove.addEventListener("click", function () {
+            remove.title = 'Remove photo';
 
-                // Release temporary image URL.
+            // Remove selected photo.
+            remove.addEventListener('click', function () {
+
                 URL.revokeObjectURL(cmPhotos[index].url);
 
-                // Remove photo from array.
                 cmPhotos.splice(index, 1);
 
-                // Update thumbnails.
                 renderPhotoList();
 
-                // Regenerate collage.
                 if (cmPhotos.length > 0) {
 
                     generateCollage();
 
                 } else {
 
-                    // Clear canvas when all photos are removed.
+                    // Invalidate any ongoing generation.
+                    cmGenerationId++;
+
                     cmCtx.clearRect(
                         0,
                         0,
@@ -259,13 +360,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     cmDownload.disabled = true;
 
                     cmStatus.textContent =
-                        "Add photos to create a collage.";
+                        'Add photos to create a collage.';
 
                 }
 
             });
 
-            // Add image and remove button.
             item.appendChild(img);
 
             item.appendChild(remove);
@@ -277,40 +377,48 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
+    /* -----------------------------------------------------
        5. CALCULATE AUTOMATIC COLLAGE LAYOUT
-    ===================================================== */
+    ----------------------------------------------------- */
 
     function calculateGrid(count) {
 
-        // Get selected layout.
-        const layoutType =
-            document.getElementById("cm-layout").value;
-
         // Equal grid layout.
-        if (layoutType === "equal") {
+        if (cmLayout.value === 'equal') {
 
             const columns = Math.ceil(Math.sqrt(count * 16 / 9));
 
             return {
+
                 columns: columns,
+
                 rows: Math.ceil(count / columns)
+
             };
 
         }
 
-        // Automatic landscape layout.
+        // Automatic landscape layouts.
         const layouts = {
 
             1: [1, 1],
+
             2: [2, 1],
+
             3: [3, 1],
+
             4: [2, 2],
+
             5: [3, 2],
+
             6: [3, 2],
+
             7: [4, 2],
+
             8: [4, 2],
+
             9: [3, 3],
+
             10: [4, 3]
 
         };
@@ -328,9 +436,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       6. LOAD SELECTED IMAGE
-    ===================================================== */
+    /* -----------------------------------------------------
+       6. LOAD IMAGE FILE
+    ----------------------------------------------------- */
 
     function loadImage(url) {
 
@@ -338,19 +446,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const img = new Image();
 
-            // Resolve after successful image loading.
-            img.onload = function () {
+            img.onload = () => resolve(img);
 
-                resolve(img);
-
-            };
-
-            // Handle image loading errors.
-            img.onerror = function () {
-
-                reject(new Error("Image could not be loaded."));
-
-            };
+            img.onerror = () => reject(
+                new Error('Unable to load selected image.')
+            );
 
             img.src = url;
 
@@ -359,36 +459,31 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
+    /* -----------------------------------------------------
        7. DRAW IMAGE WITHOUT DISTORTION
-    ===================================================== */
+    ----------------------------------------------------- */
 
     function drawCover(ctx, img, x, y, width, height) {
 
-        // Calculate image scaling.
+        // Calculate correct image scaling.
         const scale = Math.max(
             width / img.width,
             height / img.height
         );
 
-        // Calculate scaled image dimensions.
-        const scaledWidth = img.width * scale;
+        // Calculate center crop.
+        const cropX = (img.width - width / scale) / 2;
 
-        const scaledHeight = img.height * scale;
+        const cropY = (img.height - height / scale) / 2;
 
-        // Calculate center cropping.
-        const cropX = (scaledWidth - width) / 2;
-
-        const cropY = (scaledHeight - height) / 2;
-
-        // Draw image inside its tile.
+        // Draw image.
         ctx.drawImage(
 
             img,
 
-            cropX / scale,
+            cropX,
 
-            cropY / scale,
+            cropY,
 
             width / scale,
 
@@ -407,48 +502,46 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
 
-    /* =====================================================
-       8. GENERATE HD COLLAGE
-    ===================================================== */
+    /* -----------------------------------------------------
+       8. GENERATE HD LANDSCAPE COLLAGE
+    ----------------------------------------------------- */
 
     async function generateCollage() {
 
-        // Check whether photos are available.
+        // Check for uploaded photos.
         if (cmPhotos.length === 0) {
 
             cmStatus.textContent =
-                "Please upload some photos first.";
+                'Please upload photos first.';
 
             return;
 
         }
 
-        // Disable buttons during processing.
+        // Create unique generation ID.
+        const currentGeneration = ++cmGenerationId;
+
+        // Disable buttons during generation.
         cmGenerate.disabled = true;
 
         cmDownload.disabled = true;
 
         cmStatus.textContent =
-            "Creating your HD collage...";
+            'Creating your HD collage...';
 
         try {
 
-            // HD landscape dimensions.
+            // Set HD landscape dimensions.
             const canvasWidth = 1920;
 
             const canvasHeight = 1080;
 
-            // Set canvas dimensions.
             cmCanvas.width = canvasWidth;
 
             cmCanvas.height = canvasHeight;
 
-            // Get background color.
-            const background =
-                document.getElementById("cm-background").value;
-
-            // Fill canvas background.
-            cmCtx.fillStyle = background;
+            // Get selected background.
+            cmCtx.fillStyle = cmBackground.value;
 
             cmCtx.fillRect(
                 0,
@@ -457,134 +550,132 @@ document.addEventListener("DOMContentLoaded", function () {
                 canvasHeight
             );
 
-            // Get spacing between photos.
-            const gap = Number(
-                document.getElementById("cm-gap").value
-            );
+            // Get photo spacing.
+            const gap = Number(cmGap.value);
 
-            // Calculate collage layout.
+            // Calculate layout.
             const grid = calculateGrid(cmPhotos.length);
 
             const columns = grid.columns;
 
             const rows = grid.rows;
 
-            // Calculate each photo tile's dimensions.
+            // Calculate tile dimensions.
             const tileWidth =
                 (canvasWidth - gap * (columns + 1)) / columns;
 
             const tileHeight =
                 (canvasHeight - gap * (rows + 1)) / rows;
 
-            // Load all images together.
+            // Save current photo URLs.
+            const photoURLs = cmPhotos.map(photo => photo.url);
+
+            // Load all photos.
             const images = await Promise.all(
-
-                cmPhotos.map(photo => loadImage(photo.url))
-
+                photoURLs.map(url => loadImage(url))
             );
 
-            // Draw each image in the calculated position.
+            // Ignore outdated generation requests.
+            if (currentGeneration !== cmGenerationId) return;
+
+            // Draw each image.
             images.forEach((img, index) => {
 
-                // Calculate column position.
+                // Calculate grid position.
                 const column = index % columns;
 
-                // Calculate row position.
                 const row = Math.floor(index / columns);
 
-                // Calculate image coordinates.
+                // Calculate image position.
                 const x = gap + column * (tileWidth + gap);
 
                 const y = gap + row * (tileHeight + gap);
 
-                // Draw image without stretching.
+                // Draw photo.
                 drawCover(
-
                     cmCtx,
-
                     img,
-
                     x,
-
                     y,
-
                     tileWidth,
-
                     tileHeight
-
                 );
 
             });
 
-            // Enable download after successful generation.
+            // Enable download.
             cmDownload.disabled = false;
 
             cmStatus.textContent =
-                "Your HD landscape collage is ready!";
+                'Your HD landscape collage is ready!';
 
         } catch (error) {
 
-            // Display errors in console.
-            console.error("Collage Error:", error);
+            console.error('Collage generation error:', error);
 
-            cmStatus.textContent =
-                "Something went wrong while creating the collage.";
+            if (currentGeneration === cmGenerationId) {
+
+                cmStatus.textContent =
+                    'Unable to generate collage. Please try again.';
+
+            }
 
         } finally {
 
-            // Re-enable generate button.
-            cmGenerate.disabled = false;
+            // Enable button only for the latest request.
+            if (currentGeneration === cmGenerationId) {
+
+                cmGenerate.disabled = false;
+
+            }
 
         }
 
     }
 
 
-    /* =====================================================
-       9. GENERATE COLLAGE BUTTON
-    ===================================================== */
+    /* -----------------------------------------------------
+       9. GENERATE BUTTON EVENT
+    ----------------------------------------------------- */
 
-    cmGenerate.addEventListener("click", function () {
+    cmGenerate.addEventListener('click', function (event) {
+
+        event.preventDefault();
 
         generateCollage();
 
     });
 
 
-    /* =====================================================
-       10. AUTOMATIC PREVIEW UPDATE
-    ===================================================== */
+    /* -----------------------------------------------------
+       10. UPDATE PREVIEW WHEN SETTINGS CHANGE
+    ----------------------------------------------------- */
 
-    // Regenerate when layout changes.
-    document.getElementById("cm-layout")
-        .addEventListener("change", generateCollage);
+    cmLayout.addEventListener('change', generateCollage);
 
-    // Regenerate when spacing changes.
-    document.getElementById("cm-gap")
-        .addEventListener("change", generateCollage);
+    cmGap.addEventListener('change', generateCollage);
 
-    // Regenerate when background changes.
-    document.getElementById("cm-background")
-        .addEventListener("change", generateCollage);
+    cmBackground.addEventListener('change', generateCollage);
 
 
-    /* =====================================================
-       11. DOWNLOAD HD COLLAGE
-    ===================================================== */
+    /* -----------------------------------------------------
+       11. DOWNLOAD COLLAGE AS HD PNG
+    ----------------------------------------------------- */
 
-    cmDownload.addEventListener("click", function () {
+    cmDownload.addEventListener('click', function (event) {
 
-        // Check whether photos exist.
+        event.preventDefault();
+
         if (cmPhotos.length === 0) return;
 
-        // Convert canvas into PNG.
+        cmStatus.textContent = 'Preparing PNG download...';
+
         cmCanvas.toBlob(function (blob) {
 
-            // Check generated file.
             if (!blob) {
 
                 cmStatus.textContent =
-                    "Unable to download the collage.";
+                    'Unable to create PNG file.';
 
                 return;
 
@@ -593,68 +684,74 @@ document.addEventListener("DOMContentLoaded", function () {
             // Create temporary download URL.
             const downloadURL = URL.createObjectURL(blob);
 
-            // Create download link.
-            const link = document.createElement("a");
+            const link = document.createElement('a');
 
             link.href = downloadURL;
 
-            link.download = "My-HD-Photo-Collage.png";
+            link.download = 'My-HD-Photo-Collage.png';
 
-            // Trigger download.
             document.body.appendChild(link);
 
             link.click();
 
             link.remove();
 
-            // Release temporary URL.
-            URL.revokeObjectURL(downloadURL);
+            // Release URL after initiating download.
+            setTimeout(() => {
+
+                URL.revokeObjectURL(downloadURL);
+
+            }, 1000);
 
             cmStatus.textContent =
-                "Your collage has been downloaded!";
+                'Your HD collage has been downloaded!';
 
-        }, "image/png");
+        }, 'image/png');
 
     });
 
 
-    /* =====================================================
+    /* -----------------------------------------------------
        12. DRAG AND DROP PHOTO UPLOAD
-    ===================================================== */
+    ----------------------------------------------------- */
 
-    // Highlight upload area when dragging files.
-    cmDropArea.addEventListener("dragover", function (event) {
-
-        event.preventDefault();
-
-        cmDropArea.classList.add("dragging");
-
-    });
-
-    // Remove highlight when leaving upload area.
-    cmDropArea.addEventListener("dragleave", function () {
-
-        cmDropArea.classList.remove("dragging");
-
-    });
-
-    // Handle dropped photos.
-    cmDropArea.addEventListener("drop", function (event) {
+    // Highlight upload box.
+    cmDropArea.addEventListener('dragover', function (event) {
 
         event.preventDefault();
 
-        cmDropArea.classList.remove("dragging");
+        cmDropArea.classList.add('dragging');
+
+    });
+
+    // Remove highlight.
+    cmDropArea.addEventListener('dragleave', function () {
+
+        cmDropArea.classList.remove('dragging');
+
+    });
+
+    // Handle dropped files.
+    cmDropArea.addEventListener('drop', function (event) {
+
+        event.preventDefault();
+
+        cmDropArea.classList.remove('dragging');
 
         addPhotos(event.dataTransfer.files);
 
     });
 
 
-    /* =====================================================
-       13. COLLAGE MAKER INITIALIZATION COMPLETE
-    ===================================================== */
+    /* -----------------------------------------------------
+       13. COLLAGE MAKER READY
+    ----------------------------------------------------- */
 
-    console.log("Photo Collage Maker initialized successfully.");
+    console.log('Photo Collage Maker initialized successfully.');
 
-});
+})();
 
+
+/* =========================================================
+   END OF WEBSITE SCRIPT.JS
+========================================================= */
