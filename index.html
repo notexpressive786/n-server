@@ -1,375 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <!-- =================================================
-         PROJECT: MY WEBSITE
-         FILE: index.html
-         LANGUAGE: HTML5
-
-         PURPOSE:
-         HTML creates the structure and content of a website.
-
-         ================================================= -->
-
-
-    <!-- 01. BASIC DOCUMENT INFORMATION -->
-
-    <!-- Defines character encoding for the website -->
-    <meta charset="UTF-8">
-
-    <!-- Makes website responsive on mobile devices -->
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <!-- Description shown by search engines -->
-    <meta name="description"
-          content="Welcome to my professional website.">
-
-    <!-- Website title shown in browser tab -->
-    <title>My Website | Home</title>
-
-
-    <!-- =================================================
-         02. CSS CONNECTION
-         Connects external CSS file to HTML.
-         ================================================= -->
-
-    <link rel="stylesheet" href="styles.css">
-
-
-    <!-- =================================================
-         03. JAVASCRIPT CONNECTION
-         defer loads JavaScript after HTML parsing.
-         ================================================= -->
-
-    <script src="script.js" defer></script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ExamShelf &mdash; Study Material for Every Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
 
-
-    <!-- =================================================
-         04. HEADER SECTION
-         Contains website logo and navigation menu.
-         ================================================= -->
-
-    <header>
-
-        <div class="container">
-
-            <nav class="navbar">
-
-                <!-- Website logo or brand name -->
-                <a href="#home" class="logo">
-                    MyWebsite
-                </a>
-
-
-                <!-- Mobile navigation toggle button -->
-                <button
-                    class="menu-toggle"
-                    id="menuToggle"
-                    type="button"
-                    aria-label="Open navigation menu"
-                    aria-expanded="false"
-                    aria-controls="navLinks">
-
-                    ☰
-
-                </button>
-
-
-                <!-- Main navigation links -->
-                <ul class="nav-links" id="navLinks">
-
-                    <li>
-                        <a href="#home">Home</a>
-                    </li>
-
-                    <li>
-                        <a href="#about">About</a>
-                    </li>
-
-                    <li>
-                        <a href="#services">Services</a>
-                    </li>
-
-                    <li>
-                        <a href="#contact">Contact</a>
-                    </li>
-
-                </ul>
-
-            </nav>
-
-        </div>
-
-    </header>
-
-
-
-    <!-- =================================================
-         05. MAIN WEBSITE CONTENT
-         Contains the main sections of the website.
-         ================================================= -->
-
-    <main>
-
-
-        <!-- =================================================
-             06. HERO SECTION
-             First section visitors see on the website.
-             ================================================= -->
-
-        <section class="hero" id="home">
-
-            <div class="container">
-
-                <!-- Main website heading -->
-                <h1>
-                    Welcome to My Website
-                </h1>
-
-
-                <!-- Short introduction -->
-                <p>
-                    Discover my website, explore our services
-                    and learn more about what we offer.
-                </p>
-
-
-                <!-- Button navigates to services section -->
-                <a href="#services" class="btn">
-                    Explore Services
-                </a>
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             07. ABOUT SECTION
-             Provides information about the website.
-             ================================================= -->
-
-        <section class="about container" id="about">
-
-            <h2>About Us</h2>
-
-            <p>
-                Welcome to our website. We aim to provide
-                useful information, quality services and
-                an excellent user experience.
-            </p>
-
-        </section>
-
-
-
-        <!-- =================================================
-             08. SERVICES SECTION
-             Displays services using reusable cards.
-             ================================================= -->
-
-        <section class="services container" id="services">
-
-            <h2 class="text-center">
-                Our Services
-            </h2>
-
-            <p class="text-center">
-                Explore the services we provide.
-            </p>
-
-
-            <!-- Grid container for service cards -->
-            <div class="grid">
-
-
-                <!-- Service Card 1 -->
-                <article class="card">
-
-                    <h3>Web Design</h3>
-
-                    <p>
-                        Create attractive and professional
-                        website designs.
-                    </p>
-
-                    <a href="#contact">
-                        Learn More
-                    </a>
-
-                </article>
-
-
-
-                <!-- Service Card 2 -->
-                <article class="card">
-
-                    <h3>Development</h3>
-
-                    <p>
-                        Build responsive and functional
-                        websites using modern technologies.
-                    </p>
-
-                    <a href="#contact">
-                        Learn More
-                    </a>
-
-                </article>
-
-
-
-                <!-- Service Card 3 -->
-                <article class="card">
-
-                    <h3>Digital Services</h3>
-
-                    <p>
-                        Discover useful digital solutions
-                        for your business.
-                    </p>
-
-                    <a href="#contact">
-                        Learn More
-                    </a>
-
-                </article>
-
-
-            </div>
-
-        </section>
-
-
-
-        <!-- =================================================
-             09. CONTACT SECTION
-             Allows visitors to enter their information.
-             ================================================= -->
-
-        <section class="contact container" id="contact">
-
-            <h2>Contact Us</h2>
-
-            <p>
-                Fill out the form to get in touch with us.
-            </p>
-
-
-            <!-- Contact form -->
-            <form id="contactForm">
-
-                <!-- Name input -->
-                <label for="name">
-                    Your Name
-                </label>
-
-                <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    placeholder="Enter your name"
-                    autocomplete="name"
-                    required>
-
-
-                <!-- Email input -->
-                <label for="email">
-                    Your Email
-                </label>
-
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    autocomplete="email"
-                    required>
-
-
-                <!-- Message input -->
-                <label for="message">
-                    Your Message
-                </label>
-
-                <textarea
-                    id="message"
-                    name="message"
-                    placeholder="Write your message"
-                    required></textarea>
-
-
-                <!-- Form submission button -->
-                <button type="submit" class="btn">
-                    Send Message
-                </button>
-
-
-                <!-- JavaScript displays form status here -->
-                <p
-                    id="formStatus"
-                    role="status"
-                    aria-live="polite">
-                </p>
-
-            </form>
-
-        </section>
-
-
-    </main>
-
-
-
-    <!-- =================================================
-         10. FOOTER SECTION
-         Displays copyright and website information.
-         ================================================= -->
-
-    <footer>
-
-        <div class="container">
-
-            <p>
-                &copy; 2026 MyWebsite.
-                All Rights Reserved.
-            </p>
-
-            <p>
-                Designed and developed with HTML, CSS
-                and JavaScript.
-            </p>
-
-        </div>
-
-    </footer>
-
-
-
-    <!-- =================================================
-         END OF INDEX.HTML
-
-         HTML creates the website structure.
-         CSS controls the website appearance.
-         JavaScript controls website functionality.
-
-         ================================================= -->
+<header class="site-header">
+  <div class="shell header-row">
+    <a class="brand" href="#top">Exam<span>Shelf</span></a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#browse">Browse by exam</a>
+      <a href="#catalog">Materials</a>
+      <a href="#contribute">Contribute</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="main-nav" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero shell">
+    <div class="hero-text">
+      <p class="kicker">A shared shelf, not a search engine</p>
+      <h1>Find the right notes before you need them.</h1>
+      <p class="lede">Teachers and aspirants upload what actually helped them pass &mdash; organised by exam and
+      subject, so you spend your evening studying instead of scrolling.</p>
+      <form class="search-row" role="search" id="searchForm">
+        <label for="searchInput" class="visually-hidden">Search materials</label>
+        <input type="search" id="searchInput" placeholder="Search &ldquo;Science Varg 2&rdquo;, &ldquo;Reasoning&rdquo;, &ldquo;TGT Maths&rdquo;&hellip;">
+        <button type="submit">Search</button>
+      </form>
+    </div>
+    <dl class="hero-stats">
+      <div><dt>412</dt><dd>documents on the shelf</dd></div>
+      <div><dt>9</dt><dd>exams covered</dd></div>
+      <div><dt>38</dt><dd>added this month</dd></div>
+    </dl>
+  </section>
+
+  <section class="browse shell" id="browse">
+    <h2>Browse by exam</h2>
+    <div class="pill-row" id="examPills">
+      <button class="pill is-active" data-exam="all">All exams</button>
+      <button class="pill" data-exam="mptet1">MP TET Varg 1</button>
+      <button class="pill" data-exam="mptet2">MP TET Varg 2</button>
+      <button class="pill" data-exam="tgt">TGT</button>
+      <button class="pill" data-exam="pgt">PGT</button>
+      <button class="pill" data-exam="sscgl">SSC CGL</button>
+      <button class="pill" data-exam="railway">Railway NTPC</button>
+      <button class="pill" data-exam="banking">Banking (IBPS/SBI)</button>
+    </div>
+  </section>
+
+  <section class="catalog shell" id="catalog">
+    <div class="catalog-head">
+      <h2>Latest materials</h2>
+      <p class="muted" id="resultCount">14 documents</p>
+    </div>
+
+    <div class="catalog-table" role="table" aria-label="Study materials">
+      <div class="row head" role="row">
+        <span role="columnheader">Title</span>
+        <span role="columnheader">Exam</span>
+        <span role="columnheader">Subject</span>
+        <span role="columnheader">Type</span>
+        <span role="columnheader">Size</span>
+        <span role="columnheader"></span>
+      </div>
+
+      <div class="row" role="row" data-exam="mptet2">
+        <span class="title" role="cell">Science &ndash; Complete Topic-wise Notes (Class 6&ndash;10)</span>
+        <span role="cell"><span class="tag">MP TET Varg 2</span></span>
+        <span role="cell">Science</span>
+        <span role="cell">PDF</span>
+        <span role="cell">1.4 MB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="mptet2">
+        <span class="title" role="cell">Biology Unit-wise Revision &ndash; Heredity, Cell, Biotechnology</span>
+        <span role="cell"><span class="tag">MP TET Varg 2</span></span>
+        <span role="cell">Science</span>
+        <span role="cell">PDF</span>
+        <span role="cell">820 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="mptet1">
+        <span class="title" role="cell">Primary Teacher Pedagogy &ndash; Child Development Notes</span>
+        <span role="cell"><span class="tag">MP TET Varg 1</span></span>
+        <span role="cell">Pedagogy</span>
+        <span role="cell">PDF</span>
+        <span role="cell">640 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="tgt">
+        <span class="title" role="cell">TGT Mathematics &ndash; Algebra &amp; Mensuration Formula Sheet</span>
+        <span role="cell"><span class="tag">TGT</span></span>
+        <span role="cell">Mathematics</span>
+        <span role="cell">PDF</span>
+        <span role="cell">510 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="tgt">
+        <span class="title" role="cell">TGT Social Science &ndash; Modern Indian History Timeline</span>
+        <span role="cell"><span class="tag">TGT</span></span>
+        <span role="cell">Social Science</span>
+        <span role="cell">PDF</span>
+        <span role="cell">1.1 MB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="pgt">
+        <span class="title" role="cell">PGT Physics &ndash; Electrostatics &amp; Current Electricity Notes</span>
+        <span role="cell"><span class="tag">PGT</span></span>
+        <span role="cell">Physics</span>
+        <span role="cell">PDF</span>
+        <span role="cell">960 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="sscgl">
+        <span class="title" role="cell">SSC CGL &ndash; Quantitative Aptitude Shortcut Formulas</span>
+        <span role="cell"><span class="tag">SSC CGL</span></span>
+        <span role="cell">Mathematics</span>
+        <span role="cell">PDF</span>
+        <span role="cell">730 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="sscgl">
+        <span class="title" role="cell">SSC CGL &ndash; English Grammar: One-Word Substitution List</span>
+        <span role="cell"><span class="tag">SSC CGL</span></span>
+        <span role="cell">English</span>
+        <span role="cell">PDF</span>
+        <span role="cell">390 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="railway">
+        <span class="title" role="cell">Railway NTPC &ndash; General Awareness Current Affairs (2026)</span>
+        <span role="cell"><span class="tag">Railway NTPC</span></span>
+        <span role="cell">General Awareness</span>
+        <span role="cell">PDF</span>
+        <span role="cell">2.0 MB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="railway">
+        <span class="title" role="cell">Railway NTPC &ndash; Reasoning: Puzzles &amp; Seating Arrangement</span>
+        <span role="cell"><span class="tag">Railway NTPC</span></span>
+        <span role="cell">Reasoning</span>
+        <span role="cell">PDF</span>
+        <span role="cell">880 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="banking">
+        <span class="title" role="cell">IBPS/SBI &ndash; Banking Awareness Handbook</span>
+        <span role="cell"><span class="tag">Banking</span></span>
+        <span role="cell">Banking Awareness</span>
+        <span role="cell">PDF</span>
+        <span role="cell">1.3 MB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="banking">
+        <span class="title" role="cell">IBPS Clerk &ndash; Quant: Data Interpretation Practice Set</span>
+        <span role="cell"><span class="tag">Banking</span></span>
+        <span role="cell">Mathematics</span>
+        <span role="cell">PDF</span>
+        <span role="cell">670 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="mptet2">
+        <span class="title" role="cell">Chemistry &ndash; Periodicity &amp; Bonding Quick Revision</span>
+        <span role="cell"><span class="tag">MP TET Varg 2</span></span>
+        <span role="cell">Science</span>
+        <span role="cell">PDF</span>
+        <span role="cell">540 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+
+      <div class="row" role="row" data-exam="mptet1">
+        <span class="title" role="cell">EVS &ndash; Environment &amp; Science Integration Notes</span>
+        <span role="cell"><span class="tag">MP TET Varg 1</span></span>
+        <span role="cell">EVS</span>
+        <span role="cell">PDF</span>
+        <span role="cell">450 KB</span>
+        <span role="cell"><a class="dl" href="#">Download</a></span>
+      </div>
+    </div>
+
+    <p class="empty-state" id="emptyState" hidden>No documents match that search yet &mdash; try a different exam or keyword.</p>
+  </section>
+
+  <section class="contribute shell" id="contribute">
+    <div class="contribute-box">
+      <h2>Have notes worth sharing?</h2>
+      <p>If a document got you through your own exam, it can do the same for someone studying tonight.
+      Send it in &mdash; subject-wise, exam-tagged, and credited to you.</p>
+      <a class="btn-primary" href="mailto:contribute@examshelf.in">Submit a document</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-row">
+    <p>&copy; 2026 ExamShelf. Shared freely for exam preparation.</p>
+    <p class="muted">Built by aspirants, for aspirants.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  const pills = document.querySelectorAll('.pill');
+  const rows = document.querySelectorAll('.catalog-table .row:not(.head)');
+  const resultCount = document.getElementById('resultCount');
+  const emptyState = document.getElementById('emptyState');
+  const searchInput = document.getElementById('searchInput');
+  const searchForm = document.getElementById('searchForm');
+  const navToggle = document.getElementById('navToggle');
+  const mainNav = document.querySelector('.main-nav');
+
+  let activeExam = 'all';
+
+  function applyFilters() {
+    const query = searchInput.value.trim().toLowerCase();
+    let visible = 0;
+
+    rows.forEach((row) => {
+      const matchesExam = activeExam === 'all' || row.dataset.exam === activeExam;
+      const matchesQuery = !query || row.textContent.toLowerCase().includes(query);
+      const show = matchesExam && matchesQuery;
+      row.style.display = show ? '' : 'none';
+      if (show) visible += 1;
+    });
+
+    resultCount.textContent = visible + (visible === 1 ? ' document' : ' documents');
+    emptyState.hidden = visible !== 0;
+  }
+
+  pills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      pills.forEach((p) => p.classList.remove('is-active'));
+      pill.classList.add('is-active');
+      activeExam = pill.dataset.exam;
+      applyFilters();
+    });
+  });
+
+  searchForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    applyFilters();
+  });
+  searchInput.addEventListener('input', applyFilters);
+
+  navToggle.addEventListener('click', () => {
+    const open = mainNav.classList.toggle('is-open');
+    navToggle.setAttribute('aria-expanded', open);
+  });
+})();
+</script>
 
 </body>
-
 </html>
-
-
-
-
-</html>
-</body>
