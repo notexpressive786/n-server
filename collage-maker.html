@@ -1,1 +1,856 @@
 
+#COLLAGE MAKER
+
+  
+<!-- =====================================================
+     PHOTO COLLAGE MAKER
+     Features: Multiple uploads, automatic landscape
+     arrangement, HD preview, image removal and PNG download.
+====================================================== -->
+
+<section id="collage-maker">
+
+    <!-- Main heading -->
+    <div class="cm-heading">
+        <span class="cm-tag">CREATIVE STUDIO</span>
+        <h2>Photo Collage Maker</h2>
+        <p>Turn your favourite photos into beautiful collages.</p>
+    </div>
+
+    <!-- Main collage application -->
+    <div class="cm-container">
+
+        <!-- Upload area -->
+        <div class="cm-upload-area" id="cm-drop-area">
+
+            <div class="cm-upload-icon">📸</div>
+            <h3>Upload Your Photos</h3>
+            <p>Select up to 10 photos at once</p>
+
+            <label for="cm-file-input" class="cm-upload-btn">
+                + Select Photos
+            </label>
+
+            <input
+                type="file"
+                id="cm-file-input"
+                accept="image/*"
+                multiple
+                hidden
+            >
+
+            <small>JPG, JPEG, PNG and WEBP supported</small>
+        </div>
+
+        <!-- Selected image information -->
+        <div class="cm-photo-header">
+            <h3>Selected Photos</h3>
+            <span id="cm-photo-count">0 / 10</span>
+        </div>
+
+        <!-- Uploaded image thumbnails -->
+        <div id="cm-photo-list" class="cm-photo-list">
+            <p class="cm-empty">Your selected photos will appear here.</p>
+        </div>
+
+        <!-- Collage settings -->
+        <div class="cm-settings">
+
+            <div class="cm-setting">
+                <label for="cm-layout">Collage Layout</label>
+                <select id="cm-layout">
+                    <option value="auto">Automatic Layout</option>
+                    <option value="equal">Equal Grid</option>
+                </select>
+            </div>
+
+            <div class="cm-setting">
+                <label for="cm-gap">Photo Spacing</label>
+                <select id="cm-gap">
+                    <option value="0">No Spacing</option>
+                    <option value="8">Small</option>
+                    <option value="16" selected>Medium</option>
+                    <option value="25">Large</option>
+                </select>
+            </div>
+
+            <div class="cm-setting">
+                <label for="cm-background">Background</label>
+                <select id="cm-background">
+                    <option value="#ffffff">White</option>
+                    <option value="#000000">Black</option>
+                    <option value="#eeeeee">Light Grey</option>
+                </select>
+            </div>
+
+        </div>
+
+        <!-- Generate button -->
+        <button id="cm-generate" class="cm-generate-btn">
+            ✨ Generate Collage
+        </button>
+
+        <!-- Preview section -->
+        <div class="cm-preview-section">
+
+            <div class="cm-preview-heading">
+                <h3>Collage Preview</h3>
+                <span>LANDSCAPE · HD</span>
+            </div>
+
+            <div class="cm-canvas-wrapper">
+                <canvas id="cm-canvas" width="1920" height="1080"></canvas>
+            </div>
+
+            <p class="cm-preview-note">
+                Your collage will be generated in 1920 × 1080 resolution.
+            </p>
+
+            <!-- Download button -->
+            <button id="cm-download" class="cm-download-btn" disabled>
+                ↓ Download HD Collage
+            </button>
+
+        </div>
+
+        <!-- Status messages -->
+        <p id="cm-status" class="cm-status" aria-live="polite"></p>
+
+    </div>
+</section>
+
+
+<!-- =====================================================
+     COLLAGE MAKER STYLING
+====================================================== -->
+
+<style>
+
+/* Main section */
+#collage-maker {
+    padding: 60px 20px;
+    background: #f5f7fb;
+    font-family: Arial, sans-serif;
+    color: #222;
+}
+
+/* Heading */
+.cm-heading {
+    text-align: center;
+    margin-bottom: 35px;
+}
+
+.cm-tag {
+    display: inline-block;
+    background: #e8edff;
+    color: #4355c5;
+    padding: 7px 15px;
+    border-radius: 30px;
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.cm-heading h2 {
+    font-size: 32px;
+    margin: 15px 0 8px;
+}
+
+.cm-heading p {
+    color: #777;
+    font-size: 15px;
+}
+
+/* Main container */
+.cm-container {
+    max-width: 950px;
+    margin: auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 8px 35px rgba(0,0,0,0.06);
+}
+
+/* Upload box */
+.cm-upload-area {
+    text-align: center;
+    padding: 40px 20px;
+    border: 2px dashed #b9c4e9;
+    border-radius: 15px;
+    background: #f9faff;
+    transition: 0.3s;
+}
+
+.cm-upload-area.dragging {
+    background: #e9edff;
+    border-color: #4355c5;
+}
+
+.cm-upload-icon {
+    font-size: 45px;
+    margin-bottom: 10px;
+}
+
+.cm-upload-area h3 {
+    margin: 10px 0;
+}
+
+.cm-upload-area p,
+.cm-upload-area small {
+    color: #777;
+}
+
+.cm-upload-btn {
+    display: inline-block;
+    background: #4355c5;
+    color: white;
+    padding: 13px 25px;
+    border-radius: 9px;
+    cursor: pointer;
+    margin: 15px 0;
+    font-weight: bold;
+}
+
+.cm-upload-btn:hover {
+    background: #303f9f;
+}
+
+/* Photo list */
+.cm-photo-header,
+.cm-preview-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0 15px;
+}
+
+.cm-photo-header h3,
+.cm-preview-heading h3 {
+    margin: 0;
+}
+
+#cm-photo-count,
+.cm-preview-heading span {
+    color: #4355c5;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.cm-photo-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-height: 75px;
+}
+
+.cm-empty {
+    color: #999;
+    font-size: 14px;
+}
+
+/* Individual thumbnail */
+.cm-photo-item {
+    width: 100px;
+    height: 100px;
+    position: relative;
+}
+
+.cm-photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 9px;
+    border: 1px solid #ddd;
+}
+
+.cm-remove {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    width: 25px;
+    height: 25px;
+    border: none;
+    border-radius: 50%;
+    background: #e53935;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Settings */
+.cm-settings {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin: 30px 0;
+}
+
+.cm-setting label {
+    display: block;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 9px;
+}
+
+.cm-setting select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    font-size: 14px;
+}
+
+/* Action buttons */
+.cm-generate-btn,
+.cm-download-btn {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 9px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.cm-generate-btn {
+    background: #4355c5;
+    color: white;
+}
+
+.cm-generate-btn:hover {
+    background: #303f9f;
+}
+
+.cm-download-btn {
+    margin-top: 18px;
+    background: #159957;
+    color: white;
+}
+
+.cm-download-btn:hover:not(:disabled) {
+    background: #087c43;
+}
+
+.cm-download-btn:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+/* Preview */
+.cm-preview-section {
+    margin-top: 35px;
+}
+
+.cm-canvas-wrapper {
+    width: 100%;
+    overflow: hidden;
+    background: #eee;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+}
+
+#cm-canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+}
+
+.cm-preview-note {
+    text-align: center;
+    color: #888;
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+.cm-status {
+    text-align: center;
+    font-size: 14px;
+    color: #4355c5;
+    margin-top: 15px;
+}
+
+/* Mobile responsive */
+@media (max-width: 600px) {
+
+    #collage-maker {
+        padding: 35px 12px;
+    }
+
+    .cm-container {
+        padding: 18px;
+    }
+
+    .cm-heading h2 {
+        font-size: 25px;
+    }
+
+    .cm-settings {
+        grid-template-columns: 1fr;
+    }
+
+    .cm-photo-item {
+        width: 75px;
+        height: 75px;
+    }
+
+}
+
+</style>
+
+
+<!-- =====================================================
+     COLLAGE MAKER JAVASCRIPT
+====================================================== -->
+
+<script>
+
+/* -----------------------------------------------------
+   1. GET HTML ELEMENTS
+----------------------------------------------------- */
+
+const cmInput = document.getElementById("cm-file-input");
+const cmPhotoList = document.getElementById("cm-photo-list");
+const cmPhotoCount = document.getElementById("cm-photo-count");
+const cmCanvas = document.getElementById("cm-canvas");
+const cmCtx = cmCanvas.getContext("2d");
+
+const cmGenerate = document.getElementById("cm-generate");
+const cmDownload = document.getElementById("cm-download");
+const cmStatus = document.getElementById("cm-status");
+const cmDropArea = document.getElementById("cm-drop-area");
+
+
+/* -----------------------------------------------------
+   2. STORE SELECTED PHOTOS
+----------------------------------------------------- */
+
+let cmPhotos = [];
+
+// Maximum photos allowed in one collage.
+const CM_MAX_PHOTOS = 10;
+
+
+/* -----------------------------------------------------
+   3. HANDLE PHOTO SELECTION
+----------------------------------------------------- */
+
+cmInput.addEventListener("change", function(event) {
+
+    addPhotos(event.target.files);
+
+    // Reset input so the same photos can be selected again.
+    cmInput.value = "";
+
+});
+
+
+/* -----------------------------------------------------
+   4. ADD PHOTOS TO THE COLLAGE
+----------------------------------------------------- */
+
+function addPhotos(files) {
+
+    const imageFiles = Array.from(files).filter(file =>
+        file.type.startsWith("image/")
+    );
+
+    const available = CM_MAX_PHOTOS - cmPhotos.length;
+
+    if (available <= 0) {
+        cmStatus.textContent = "Maximum 10 photos allowed.";
+        return;
+    }
+
+    const selected = imageFiles.slice(0, available);
+
+    selected.forEach(file => {
+
+        const imageURL = URL.createObjectURL(file);
+
+        cmPhotos.push({
+            file: file,
+            url: imageURL
+        });
+
+    });
+
+    if (imageFiles.length > available) {
+        cmStatus.textContent = "Only the first " + available +
+            " additional photos were added.";
+    } else {
+        cmStatus.textContent = "";
+    }
+
+    renderPhotoList();
+
+    // Automatically generate preview after adding photos.
+    if (cmPhotos.length > 0) {
+        generateCollage();
+    }
+
+}
+
+
+/* -----------------------------------------------------
+   5. DISPLAY SELECTED PHOTO THUMBNAILS
+----------------------------------------------------- */
+
+function renderPhotoList() {
+
+    cmPhotoList.innerHTML = "";
+
+    cmPhotoCount.textContent =
+        cmPhotos.length + " / " + CM_MAX_PHOTOS;
+
+    if (cmPhotos.length === 0) {
+
+        cmPhotoList.innerHTML =
+            '<p class="cm-empty">Your selected photos will appear here.</p>';
+
+        cmDownload.disabled = true;
+
+        return;
+    }
+
+    cmPhotos.forEach((photo, index) => {
+
+        const item = document.createElement("div");
+
+        item.className = "cm-photo-item";
+
+        const img = document.createElement("img");
+        img.src = photo.url;
+        img.alt = "Selected photo " + (index + 1);
+
+        const remove = document.createElement("button");
+
+        remove.className = "cm-remove";
+        remove.textContent = "×";
+        remove.title = "Remove photo";
+
+        // Remove the selected photo.
+        remove.addEventListener("click", function() {
+
+            URL.revokeObjectURL(cmPhotos[index].url);
+
+            cmPhotos.splice(index, 1);
+
+            renderPhotoList();
+
+            if (cmPhotos.length > 0) {
+                generateCollage();
+            } else {
+                cmCtx.clearRect(0, 0, cmCanvas.width, cmCanvas.height);
+                cmDownload.disabled = true;
+                cmStatus.textContent = "Add photos to create a collage.";
+            }
+
+        });
+
+        item.appendChild(img);
+        item.appendChild(remove);
+
+        cmPhotoList.appendChild(item);
+
+    });
+
+}
+
+
+/* -----------------------------------------------------
+   6. AUTOMATICALLY CALCULATE LANDSCAPE GRID
+----------------------------------------------------- */
+
+function calculateGrid(count) {
+
+    // Equal grid gives every photo the same tile size.
+    if (document.getElementById("cm-layout").value === "equal") {
+
+        const columns = Math.ceil(Math.sqrt(count * 16 / 9));
+
+        return {
+            columns: columns,
+            rows: Math.ceil(count / columns)
+        };
+
+    }
+
+    // Automatic layout uses the available landscape space.
+    const layouts = {
+        1: [1, 1],
+        2: [2, 1],
+        3: [3, 1],
+        4: [2, 2],
+        5: [3, 2],
+        6: [3, 2],
+        7: [4, 2],
+        8: [4, 2],
+        9: [3, 3],
+        10: [4, 3]
+    };
+
+    const layout = layouts[count] || [3, 3];
+
+    return {
+        columns: layout[0],
+        rows: layout[1]
+    };
+
+}
+
+
+/* -----------------------------------------------------
+   7. LOAD IMAGE FILE
+----------------------------------------------------- */
+
+function loadImage(url) {
+
+    return new Promise((resolve, reject) => {
+
+        const img = new Image();
+
+        img.onload = () => resolve(img);
+
+        img.onerror = reject;
+
+        img.src = url;
+
+    });
+
+}
+
+
+/* -----------------------------------------------------
+   8. DRAW IMAGE WITHOUT DISTORTION
+----------------------------------------------------- */
+
+function drawCover(ctx, img, x, y, width, height) {
+
+    // Calculate scaling to cover the entire tile.
+    const scale = Math.max(
+        width / img.width,
+        height / img.height
+    );
+
+    const scaledWidth = img.width * scale;
+    const scaledHeight = img.height * scale;
+
+    // Center crop the image.
+    const cropX = (scaledWidth - width) / 2;
+    const cropY = (scaledHeight - height) / 2;
+
+    ctx.drawImage(
+        img,
+        cropX / scale,
+        cropY / scale,
+        width / scale,
+        height / scale,
+        x,
+        y,
+        width,
+        height
+    );
+
+}
+
+
+/* -----------------------------------------------------
+   9. GENERATE THE LANDSCAPE COLLAGE
+----------------------------------------------------- */
+
+async function generateCollage() {
+
+    if (cmPhotos.length === 0) {
+
+        cmStatus.textContent = "Please upload some photos first.";
+
+        return;
+
+    }
+
+    cmGenerate.disabled = true;
+    cmDownload.disabled = true;
+
+    cmStatus.textContent = "Creating your HD collage...";
+
+    try {
+
+        // HD landscape dimensions.
+        const canvasWidth = 1920;
+        const canvasHeight = 1080;
+
+        cmCanvas.width = canvasWidth;
+        cmCanvas.height = canvasHeight;
+
+        // Background color.
+        const background =
+            document.getElementById("cm-background").value;
+
+        cmCtx.fillStyle = background;
+
+        cmCtx.fillRect(0, 0, canvasWidth, canvasHeight);
+
+        // Get selected photo spacing.
+        const gap = Number(
+            document.getElementById("cm-gap").value
+        );
+
+        // Calculate number of columns and rows.
+        const grid = calculateGrid(cmPhotos.length);
+
+        const columns = grid.columns;
+        const rows = grid.rows;
+
+        // Calculate individual tile dimensions.
+        const tileWidth =
+            (canvasWidth - gap * (columns + 1)) / columns;
+
+        const tileHeight =
+            (canvasHeight - gap * (rows + 1)) / rows;
+
+        // Load all selected photos.
+        const images = await Promise.all(
+            cmPhotos.map(photo => loadImage(photo.url))
+        );
+
+        // Draw all images automatically.
+        images.forEach((img, index) => {
+
+            const column = index % columns;
+            const row = Math.floor(index / columns);
+
+            const x = gap + column * (tileWidth + gap);
+            const y = gap + row * (tileHeight + gap);
+
+            drawCover(
+                cmCtx,
+                img,
+                x,
+                y,
+                tileWidth,
+                tileHeight
+            );
+
+        });
+
+        cmDownload.disabled = false;
+
+        cmStatus.textContent =
+            "Your HD landscape collage is ready!";
+
+    } catch (error) {
+
+        console.error(error);
+
+        cmStatus.textContent =
+            "Something went wrong while creating the collage.";
+
+    } finally {
+
+        cmGenerate.disabled = false;
+
+    }
+
+}
+
+
+/* -----------------------------------------------------
+   10. GENERATE BUTTON
+----------------------------------------------------- */
+
+cmGenerate.addEventListener("click", generateCollage);
+
+
+/* -----------------------------------------------------
+   11. UPDATE PREVIEW WHEN SETTINGS CHANGE
+----------------------------------------------------- */
+
+document.getElementById("cm-layout")
+    .addEventListener("change", generateCollage);
+
+document.getElementById("cm-gap")
+    .addEventListener("change", generateCollage);
+
+document.getElementById("cm-background")
+    .addEventListener("change", generateCollage);
+
+
+/* -----------------------------------------------------
+   12. DOWNLOAD COLLAGE AS HD PNG
+----------------------------------------------------- */
+
+cmDownload.addEventListener("click", function() {
+
+    if (cmPhotos.length === 0) return;
+
+    cmCanvas.toBlob(function(blob) {
+
+        if (!blob) {
+
+            cmStatus.textContent = "Unable to download the collage.";
+
+            return;
+
+        }
+
+        const downloadURL = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+
+        link.href = downloadURL;
+
+        link.download = "My-HD-Photo-Collage.png";
+
+        document.body.appendChild(link);
+
+        link.click();
+
+        link.remove();
+
+        URL.revokeObjectURL(downloadURL);
+
+        cmStatus.textContent = "Your collage has been downloaded!";
+
+    }, "image/png");
+
+});
+
+
+/* -----------------------------------------------------
+   13. DRAG AND DROP PHOTO UPLOAD
+----------------------------------------------------- */
+
+cmDropArea.addEventListener("dragover", function(event) {
+
+    event.preventDefault();
+
+    cmDropArea.classList.add("dragging");
+
+});
+
+cmDropArea.addEventListener("dragleave", function() {
+
+    cmDropArea.classList.remove("dragging");
+
+});
+
+cmDropArea.addEventListener("drop", function(event) {
+
+    event.preventDefault();
+
+    cmDropArea.classList.remove("dragging");
+
+    addPhotos(event.dataTransfer.files);
+
+});
+
+</script>
+
+<!-- =====================================================
+     END OF PHOTO COLLAGE MAKER
+====================================================== -->
+
