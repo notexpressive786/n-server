@@ -1,1 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MP TET Varg 2 Science Quiz</title>
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#16302b;--mute:#5b706b;--line:#cfdcd7;--acc:#0f6b5c;--acc2:#e9f3f0;--ok:#1b7f3b;--okbg:#e3f4e8;--bad:#b3261e;--badbg:#fbe7e5}
+@media(prefers-color-scheme:dark){:root{--bg:#10201d;--card:#172a26;--ink:#e6f1ee;--mute:#9db5ae;--line:#2c4540;--acc:#4fc3ae;--acc2:#1f3a34;--ok:#6fd48c;--okbg:#17352a;--bad:#ff8f86;--badbg:#3a1f1d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Noto Serif Devanagari',serif;padding:12px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:1.5rem;margin:8px 0 2px}
+.sub{color:var(--mute);margin:0 0 14px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:10px 14px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.row button.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+.big{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:bold;width:100%;margin-top:12px;padding:13px}
+input[type=number]{font:inherit;width:90px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{width:100%;min-height:90px;font:13px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+.note{color:var(--mute);font-size:.88rem}
+.top{display:flex;justify-content:space-between;gap:8px;color:var(--mute);font-size:.92rem}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:8px 0 14px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.q{font-size:1.15rem;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px}
+.opt:hover:not(:disabled){background:var(--acc2)}
+.opt.ok{background:var(--okbg);border-color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad)}
+.score{font-size:2.4rem;margin:0}
+.rev{border-top:1px solid var(--line);padding:10px 0}
+.t{color:var(--ok)}.f{color:var(--bad)}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>MP TET Varg 2 – Science practice</h1>
+<p class="sub">Works offline. Choose a subject, set the number of questions, press Enter to start.</p>
+
+<div id="setup">
+ <div class="card">
+  <label>Subject</label>
+  <div class="row" id="subjects"></div>
+  <label for="n">Number of questions</label>
+  <div class="row">
+   <input id="n" type="number" min="1" value="10" aria-label="Number of questions">
+   <button data-n="10">10</button><button data-n="25">25</button><button data-n="50">50</button><button data-n="100">100</button>
+  </div>
+  <p class="note" id="avail"></p>
+  <button class="big" id="start">Start quiz (Enter)</button>
+ </div>
+ <div class="card">
+  <label for="imp">Add your own questions (PYQs)</label>
+  <p class="note">One question per line: Subject | Question | Option A | Option B | Option C | Option D | Correct option number (1-4). Subject must be Biology, Chemistry or Physics. They are saved in this browser.</p>
+  <textarea id="imp" placeholder="Physics | SI unit of work? | Joule | Watt | Newton | Pascal | 1"></textarea>
+  <div class="row" style="margin-top:8px"><button id="add">Add questions</button><button id="clr">Remove my added questions</button></div>
+  <p class="note" id="impmsg"></p>
+ </div>
+</div>
+
+<div id="quiz" class="card hide">
+ <div class="top"><span id="prog"></span><span id="tm"></span></div>
+ <div class="bar"><i id="pb"></i></div>
+ <p class="q" id="qt"></p>
+ <div id="opts"></div>
+ <div class="row" style="margin-top:12px"><button id="next" class="big hide">Next (Enter)</button></div>
+ <p class="note">Keys: 1-4 to choose, Enter for next.</p>
+</div>
+
+<div id="result" class="hide">
+ <div class="card"><p class="score" id="sc"></p><p id="sb"></p><p id="tk" class="note"></p>
+ <button class="big" id="again">New quiz</button></div>
+ <div class="card" id="rev"></div>
+</div>
+</div>
+
+<script>
+// Practice bank: [subject, question, [options], correct index]. Verify before relying on it; add your own PYQs below the box.
+var BANK=[
+["Biology","Which organelle is called the powerhouse of the cell?",["Mitochondria","Ribosome","Golgi body","Nucleus"],0],
+["Biology","Which pigment is mainly responsible for photosynthesis?",["Chlorophyll","Carotene","Xanthophyll","Anthocyanin"],0],
+["Biology","Which blood group is called the universal donor?",["O negative","AB positive","A positive","B negative"],0],
+["Biology","Deficiency of which vitamin causes scurvy?",["Vitamin C","Vitamin A","Vitamin D","Vitamin K"],0],
+["Biology","What is the functional unit of the kidney?",["Nephron","Neuron","Alveolus","Villus"],0],
+["Biology","Insulin is secreted by which organ?",["Pancreas","Liver","Kidney","Stomach"],0],
+["Biology","Haemoglobin is found in which cells?",["Red blood cells","White blood cells","Platelets","Plasma cells"],0],
+["Biology","Which mosquito spreads malaria?",["Female Anopheles","Male Anopheles","Aedes","Culex"],0],
+["Biology","The study of fungi is called:",["Mycology","Virology","Phycology","Ecology"],0],
+["Biology","How many chambers does the human heart have?",["Four","Two","Three","Five"],0],
+["Chemistry","What is the atomic number of carbon?",["6","12","8","14"],0],
+["Chemistry","What is the pH of a neutral solution at 25 °C?",["7","0","14","1"],0],
+["Chemistry","What is the chemical formula of common salt?",["NaCl","KCl","CaCl2","NaOH"],0],
+["Chemistry","Which gas is most abundant in Earth's atmosphere?",["Nitrogen","Oxygen","Carbon dioxide","Argon"],0],
+["Chemistry","Rusting of iron is an example of:",["Oxidation","Reduction","Sublimation","Evaporation"],0],
+["Chemistry","Which gas is released when zinc reacts with dilute HCl?",["Hydrogen","Oxygen","Chlorine","Nitrogen"],0],
+["Chemistry","Which is the lightest element?",["Hydrogen","Helium","Lithium","Carbon"],0],
+["Chemistry","What is the formula of baking soda?",["NaHCO3","Na2CO3","NaOH","CaCO3"],0],
+["Chemistry","What is the usual valency of oxygen?",["2","1","3","4"],0],
+["Chemistry","Which acid is present in lemon?",["Citric acid","Acetic acid","Lactic acid","Tartaric acid"],0],
+["Physics","What is the SI unit of force?",["Newton","Joule","Pascal","Watt"],0],
+["Physics","What is the speed of light in vacuum (approx.)?",["3 × 10^8 m/s","3 × 10^6 m/s","3 × 10^5 m/s","3 × 10^10 m/s"],0],
+["Physics","What is the SI unit of frequency?",["Hertz","Decibel","Tesla","Ohm"],0],
+["Physics","Which lens corrects myopia (short-sightedness)?",["Concave","Convex","Bifocal","Cylindrical"],0],
+["Physics","Which mirror is used as a vehicle rear-view mirror?",["Convex","Concave","Plane","Parabolic"],0],
+["Physics","According to Ohm's law, V equals:",["I × R","I / R","R / I","I + R"],0],
+["Physics","What is the SI unit of power?",["Watt","Joule","Newton","Volt"],0],
+["Physics","Sound cannot travel through:",["Vacuum","Water","Steel","Air"],0],
+["Physics","Acceleration due to gravity on Earth is about:",["9.8 m/s²","1.6 m/s²","3.7 m/s²","98 m/s²"],0],
+["Physics","The energy possessed by a moving body is:",["Kinetic energy","Potential energy","Heat energy","Chemical energy"],0]
+];
+var FULL_MINUTES=150,FULL_COUNT=150;
+var $=function(i){return document.getElementById(i)},subj="Biology",set=[],idx=0,score=0,locked=false,t0=0,tick=null,cur=null,answers=[];
+function mine(){try{return JSON.parse(localStorage.getItem("mine")||"[]")}catch(e){return[]}}
+function allQ(){return BANK.concat(mine())}
+function pool(){return subj==="Full"?allQ():allQ().filter(function(q){return q[0]===subj})}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x}return a}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function buildSubjects(){
+ var names=[["Biology","Biology"],["Chemistry","Chemistry"],["Physics","Physics"],["Full","Full length MP TET"]];
+ $("subjects").innerHTML="";
+ names.forEach(function(p){var b=document.createElement("button");b.textContent=p[1];b.className=p[0]===subj?"sel":"";
+  b.onclick=function(){subj=p[0];if(subj==="Full")$("n").value=Math.min(FULL_COUNT,pool().length);buildSubjects();upd()};$("subjects").appendChild(b)});
+ upd();
+}
+function upd(){var m=pool().length;$("avail").textContent=m+" questions available in this section."+(subj==="Full"?" Full length uses up to "+FULL_COUNT+" questions with a "+FULL_MINUTES+" minute timer. Check the official pattern and add more questions to match it.":"")}
+document.querySelectorAll("[data-n]").forEach(function(b){b.onclick=function(){$("n").value=b.dataset.n}});
+function show(id){["setup","quiz","result"].forEach(function(x){$(x).classList.toggle("hide",x!==id)})}
+function start(){
+ var p=pool(),n=Math.max(1,parseInt($("n").value)||10);
+ if(!p.length){$("avail").textContent="No questions in this section yet. Add some below.";return}
+ n=Math.min(n,p.length);if(subj==="Full")n=Math.min(n,FULL_COUNT);
+ set=shuffle(p).slice(0,n);idx=0;score=0;answers=[];t0=Date.now();
+ clearInterval(tick);tick=setInterval(clock,1000);clock();show("quiz");render();
+}
+function clock(){var s=Math.floor((Date.now()-t0)/1000);
+ if(subj==="Full"){var left=FULL_MINUTES*60-s;if(left<=0){finish();return}s=left}
+ var m=Math.floor(s/60),r=s%60;$("tm").textContent=(subj==="Full"?"Time left ":"Time ")+m+":"+(r<10?"0":"")+r}
+function render(){
+ var q=set[idx];locked=false;
+ var o=shuffle(q[2].map(function(t,i){return{t:t,c:i===q[3]}}));cur={o:o,q:q};
+ $("prog").textContent="Question "+(idx+1)+" of "+set.length+" ("+q[0]+")";
+ $("pb").style.width=(idx/set.length*100)+"%";$("qt").textContent=q[1];
+ $("opts").innerHTML="";
+ o.forEach(function(x,i){var b=document.createElement("button");b.className="opt";b.textContent=(i+1)+". "+x.t;b.onclick=function(){pick(i)};$("opts").appendChild(b)});
+ $("next").classList.add("hide");$("next").textContent=idx===set.length-1?"Finish (Enter)":"Next (Enter)";
+}
+function pick(i){
+ if(locked)return;locked=true;var o=cur.o,bs=$("opts").children;
+ for(var k=0;k<bs.length;k++){bs[k].disabled=true;if(o[k].c)bs[k].classList.add("ok")}
+ if(o[i].c)score++;else bs[i].classList.add("bad");
+ answers.push({q:cur.q[1],sub:cur.q[0],yours:o[i].t,right:cur.q[2][cur.q[3]],ok:o[i].c});
+ $("next").classList.remove("hide");
+}
+function next(){if(!locked)return;idx++;if(idx>=set.length)finish();else render()}
+function finish(){
+ clearInterval(tick);var s=Math.floor((Date.now()-t0)/1000),tot=set.length,att=answers.length;
+ $("sc").textContent=score+" / "+tot;
+ $("sb").textContent=Math.round(score/tot*100)+"% correct. Attempted "+att+", wrong "+(att-score)+", skipped "+(tot-att)+".";
+ $("tk").textContent="Time taken: "+Math.floor(s/60)+" min "+(s%60)+" sec";
+ var by={};answers.forEach(function(a){by[a.sub]=by[a.sub]||[0,0];by[a.sub][1]++;if(a.ok)by[a.sub][0]++});
+ var h="<b>Subject-wise score</b><br>"+Object.keys(by).map(function(k){return esc(k)+": "+by[k][0]+"/"+by[k][1]}).join("<br>")+"<br><br><b>Review</b>";
+ answers.forEach(function(a,i){h+='<div class="rev"><b>'+(i+1)+". "+esc(a.q)+'</b><br>'+(a.ok?'<span class="t">Correct: '+esc(a.right)+'</span>':'<span class="f">Your answer: '+esc(a.yours)+'</span><br><span class="t">Correct: '+esc(a.right)+'</span>')+'</div>'});
+ $("rev").innerHTML=h;show("result");window.scrollTo(0,0);
+}
+$("start").onclick=start;$("next").onclick=next;$("again").onclick=function(){show("setup");upd()};
+document.addEventListener("keydown",function(e){
+ if(!$("setup").classList.contains("hide")){if(e.key==="Enter"&&e.target.tagName!=="TEXTAREA"&&e.target.tagName!=="BUTTON"){e.preventDefault();start()}return}
+ if(!$("quiz").classList.contains("hide")){
+  if(e.key==="Enter"){e.preventDefault();next()}
+  else if(/^[1-4]$/.test(e.key)){var i=+e.key-1;if(i<cur.o.length)pick(i)}
+ }});
+$("add").onclick=function(){
+ var lines=$("imp").value.split("\n"),ok=0,bad=0,m=mine();
+ lines.forEach(function(l){if(!l.trim())return;var p=l.split("|").map(function(x){return x.trim()});
+  var s=["Biology","Chemistry","Physics"].filter(function(x){return x.toLowerCase()===(p[0]||"").toLowerCase()})[0],a=parseInt(p[6]);
+  if(p.length===7&&s&&a>=1&&a<=4&&p[1]&&p.slice(2,6).every(Boolean)){m.push([s,p[1],p.slice(2,6),a-1]);ok++}else bad++});
+ try{localStorage.setItem("mine",JSON.stringify(m))}catch(e){$("impmsg").textContent="This browser blocked saving. Questions work for this session only.";}
+ try{localStorage.getItem("mine")}catch(e){}
+ if(ok&&!localStorage.getItem("mine")){window._tmp=m}
+ $("impmsg").textContent=ok+" added, "+bad+" line(s) skipped (check the format).";if(ok)$("imp").value="";upd();
+};
+$("clr").onclick=function(){try{localStorage.removeItem("mine")}catch(e){}$("impmsg").textContent="Your added questions were removed.";upd()};
+buildSubjects();
+</script>
+</body>
+</html>
 
