@@ -1,1 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GATE XL Life Sciences Practice Quiz</title>
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#16302b;--mute:#5b706b;--line:#cfdcd7;--acc:#0f6b5c;--acc2:#e9f3f0;--ok:#1b7f3b;--okbg:#e3f4e8;--bad:#b3261e;--badbg:#fbe7e5}
+@media(prefers-color-scheme:dark){:root{--bg:#10201d;--card:#172a26;--ink:#e6f1ee;--mute:#9db5ae;--line:#2c4540;--acc:#4fc3ae;--acc2:#1f3a34;--ok:#6fd48c;--okbg:#17352a;--bad:#ff8f86;--badbg:#3a1f1d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Noto Serif Devanagari',serif;padding:12px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:1.5rem;margin:8px 0 2px}
+.sub{color:var(--mute);margin:0 0 14px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:10px 14px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.row button.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+.big{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:bold;width:100%;margin-top:12px;padding:13px}
+input[type=number]{font:inherit;width:90px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{width:100%;min-height:90px;font:13px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+.note{color:var(--mute);font-size:.88rem}
+.top{display:flex;justify-content:space-between;gap:8px;color:var(--mute);font-size:.92rem}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:8px 0 14px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.q{font-size:1.15rem;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px}
+.opt:hover{background:var(--acc2)}
+.opt.on{background:var(--acc2);border-color:var(--acc);font-weight:bold}
+.score{font-size:2.4rem;margin:0}
+.rev{border-top:1px solid var(--line);padding:12px 0}
+.t{color:var(--ok)}.f{color:var(--bad)}
+.exp{background:var(--acc2);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.95rem}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>GATE XL (Life Sciences) practice</h1>
+<p class="sub">Works offline. Pick a section, set the number of questions, press Enter. Explanations in English and Hindi appear after you finish.</p>
 
+<div id="setup">
+ <div class="card">
+  <label>Section</label>
+  <div class="row" id="subjects"></div>
+  <label for="n">Number of questions</label>
+  <div class="row">
+   <input id="n" type="number" min="1" value="10" aria-label="Number of questions">
+   <button data-n="10">10</button><button data-n="25">25</button><button data-n="50">50</button><button data-n="65">65</button>
+  </div>
+  <p class="note" id="avail"></p>
+  <button class="big" id="start">Start quiz (Enter)</button>
+ </div>
+ <div class="card">
+  <label for="imp">Add your own questions (real PYQs)</label>
+  <p class="note">One per line: Section | Question | A | B | C | D | Correct number (1-4) | English explanation | Hindi explanation. Section must be Chemistry, Biochemistry, Botany, Microbiology, Zoology or Food Technology. Saved in this browser.</p>
+  <textarea id="imp" placeholder="Chemistry | Question? | opt A | opt B | opt C | opt D | 1 | Why it is right | सही क्यों है"></textarea>
+  <div class="row" style="margin-top:8px"><button id="add">Add questions</button><button id="clr">Remove my added questions</button></div>
+  <p class="note" id="impmsg"></p>
+ </div>
+</div>
+
+<div id="quiz" class="card hide">
+ <div class="top"><span id="prog"></span><span id="tm"></span></div>
+ <div class="bar"><i id="pb"></i></div>
+ <p class="q" id="qt"></p>
+ <div id="opts"></div>
+ <div class="row" style="margin-top:12px"><button id="next" class="big">Next (Enter)</button></div>
+ <p class="note">Keys: 1-4 to choose, Enter for next. You can change your choice or skip with Enter. Answers are shown at the end.</p>
+</div>
+
+<div id="result" class="hide">
+ <div class="card"><p class="score" id="sc"></p><p id="sb"></p><p id="tk" class="note"></p>
+ <button class="big" id="again">New quiz</button></div>
+ <div class="card" id="rev"></div>
+</div>
+</div>
+
+<script>
+// Practice bank in GATE XL style from the syllabus (not verified past papers). Format: [section, question, [options, correct FIRST], 0, English explanation, Hindi explanation]
+var BANK=[
+["Chemistry","What is the hybridization of each carbon atom in ethene?",["sp2","sp","sp3","sp3d"],0,"Each carbon forms 3 sigma bonds (2 C–H, 1 C–C) and has no lone pair, so it is sp2. The remaining p orbital forms the pi bond.","प्रत्येक कार्बन के 3 सिग्मा बंध हैं (2 C–H, 1 C–C) और कोई एकाकी युग्म नहीं है, इसलिए sp2। बचा हुआ p कक्षक पाई बंध बनाता है।"],
+["Chemistry","The unit of the rate constant of a first-order reaction is:",["s⁻¹","mol L⁻¹ s⁻¹","L mol⁻¹ s⁻¹","mol L⁻¹"],0,"Rate = k[A], so k = rate/concentration = (mol L⁻¹ s⁻¹)/(mol L⁻¹) = s⁻¹.","दर = k[A], इसलिए k = दर/सांद्रता = s⁻¹।"],
+["Chemistry","Which of the following is aromatic?",["Benzene","Cyclobutadiene","Cyclooctatetraene","Cyclopentadiene"],0,"Aromatic compounds are cyclic, planar, fully conjugated and have (4n+2) pi electrons. Benzene has 6 (n=1). Cyclobutadiene (4) is anti-aromatic; cyclooctatetraene is non-planar; cyclopentadiene has an sp3 carbon.","एरोमैटिक यौगिक चक्रीय, समतलीय, पूर्ण संयुग्मित और (4n+2) पाई इलेक्ट्रॉन वाले होते हैं। बेंज़ीन में 6 हैं।"],
+["Chemistry","For a spontaneous process in an isolated system, the entropy:",["Increases","Decreases","Stays zero","Cannot be defined"],0,"By the second law of thermodynamics, total entropy of an isolated system increases in a spontaneous process.","ऊष्मागतिकी के दूसरे नियम के अनुसार स्वतः प्रक्रिया में विलगित निकाय की एन्ट्रॉपी बढ़ती है।"],
+["Biochemistry","Which enzyme unwinds the DNA double helix at the replication fork?",["Helicase","Ligase","Primase","Topoisomerase"],0,"Helicase breaks hydrogen bonds between the strands. Primase makes RNA primers, ligase joins fragments, topoisomerase relieves supercoiling.","हेलिकेज़ दोनों स्ट्रैंड के बीच हाइड्रोजन बंध तोड़कर DNA खोलता है।"],
+["Biochemistry","In Michaelis–Menten kinetics, Km is the substrate concentration at which the velocity is:",["Half of Vmax","Equal to Vmax","One-fourth of Vmax","Zero"],0,"By definition, Km is the substrate concentration giving v = Vmax/2.","परिभाषा के अनुसार Km वह सब्सट्रेट सांद्रता है जिस पर वेग Vmax का आधा होता है।"],
+["Biochemistry","Which standard amino acid is achiral?",["Glycine","Alanine","Serine","Valine"],0,"Glycine's side chain is H, so its alpha carbon has two identical groups and is not a chiral centre.","ग्लाइसिन की पार्श्व शृंखला H है, इसलिए उसका अल्फा कार्बन किरल नहीं है।"],
+["Biochemistry","Net ATP gain from glycolysis of one glucose molecule (substrate-level phosphorylation) is:",["2","4","6","36"],0,"Glycolysis makes 4 ATP but uses 2 ATP in the preparatory phase, so the net gain is 2 ATP.","ग्लाइकोलिसिस में 4 ATP बनते हैं और 2 खर्च होते हैं, इसलिए शुद्ध लाभ 2 ATP।"],
+["Botany","In C4 plants, the primary CO2 acceptor in mesophyll cells is:",["Phosphoenolpyruvate (PEP)","RuBP","Oxaloacetate","3-PGA"],0,"PEP carboxylase fixes CO2 onto PEP to form oxaloacetate in mesophyll cells. RuBP is the acceptor in the Calvin cycle of bundle sheath cells.","C4 पौधों की मेसोफिल कोशिकाओं में CO2 का प्राथमिक ग्राही PEP है।"],
+["Botany","Which plant hormone mainly induces stomatal closure under water stress?",["Abscisic acid","Auxin","Gibberellin","Cytokinin"],0,"ABA signals guard cells to lose K⁺ and water, closing the stomata during drought.","जल तनाव में ABA रक्षक कोशिकाओं से K⁺ निकलवाकर रंध्र बंद करता है।"],
+["Botany","Double fertilization is characteristic of:",["Angiosperms","Gymnosperms","Pteridophytes","Bryophytes"],0,"One sperm fuses with the egg (zygote) and the other with the two polar nuclei (triploid endosperm) only in angiosperms.","द्विनिषेचन केवल आवृतबीजी पौधों में होता है।"],
+["Botany","The light reactions of photosynthesis occur in the:",["Thylakoid membrane","Stroma","Outer chloroplast membrane","Mitochondrial matrix"],0,"Photosystems and the electron transport chain are in the thylakoid membranes; the Calvin cycle is in the stroma.","प्रकाश अभिक्रियाएँ थायलैकॉइड झिल्ली में होती हैं।"],
+["Microbiology","The thick layer of Gram-positive bacterial cell walls is made of:",["Peptidoglycan","Lipopolysaccharide","Chitin","Cellulose"],0,"Gram-positive walls have a thick peptidoglycan layer (with teichoic acids), which retains the crystal violet stain.","ग्राम-धनात्मक जीवाणु की भित्ति में मोटी पेप्टिडोग्लाइकन परत होती है।"],
+["Microbiology","The natural inducer of the lac operon is:",["Allolactose","Lactose only","Glucose","cAMP"],0,"Lactose is converted to allolactose, which binds the repressor and releases it from the operator.","लैक्टोज़ से बना एलोलैक्टोज़ रिप्रेसर से जुड़कर ऑपरेटर से हटा देता है।"],
+["Microbiology","Which antibiotic inhibits bacterial cell wall synthesis?",["Penicillin","Tetracycline","Rifampicin","Streptomycin"],0,"Penicillin blocks the transpeptidase that cross-links peptidoglycan. Tetracycline and streptomycin act on the ribosome; rifampicin on RNA polymerase.","पेनिसिलिन पेप्टिडोग्लाइकन के क्रॉस-लिंक को रोकता है।"],
+["Microbiology","The causative agent of cholera is:",["Vibrio cholerae","Salmonella typhi","Shigella dysenteriae","Escherichia coli"],0,"Cholera is caused by the comma-shaped Gram-negative bacterium Vibrio cholerae, which releases cholera toxin.","हैजा विब्रियो कॉलरी जीवाणु से होता है।"],
+["Zoology","In a population in Hardy–Weinberg equilibrium, q² = 0.04. The frequency of heterozygotes is:",["0.32","0.16","0.08","0.64"],0,"q = 0.2, p = 0.8, so 2pq = 2 × 0.8 × 0.2 = 0.32.","q = 0.2, p = 0.8, इसलिए 2pq = 0.32।"],
+["Zoology","Antibodies are secreted by:",["Plasma cells","Macrophages","Helper T cells","Mast cells"],0,"Activated B cells differentiate into plasma cells, which secrete large amounts of antibody.","सक्रिय B कोशिकाएँ प्लाज़्मा कोशिकाओं में बदलकर एंटीबॉडी स्रावित करती हैं।"],
+["Zoology","The resting membrane potential of a neuron is mainly due to:",["Efflux of K⁺ through leak channels","Influx of Na⁺","Influx of Cl⁻ only","Ca²⁺ pumps"],0,"The membrane is most permeable to K⁺ at rest, so K⁺ leaves down its gradient, leaving the inside negative (about −70 mV).","विश्राम अवस्था में K⁺ लीक चैनल से बाहर जाता है, जिससे भीतर ऋणात्मक विभव (लगभग −70 mV) रहता है।"],
+["Zoology","Hox genes mainly control:",["Anterior–posterior body axis patterning","Cell death only","Blood clotting","Sex determination"],0,"Hox genes specify the identity of body segments along the anterior–posterior axis.","Hox जीन अग्र-पश्च शरीर अक्ष में खंडों की पहचान तय करते हैं।"],
+["Food Technology","HTST pasteurization of milk uses:",["72 °C for 15 seconds","63 °C for 30 seconds","100 °C for 1 minute","121 °C for 15 minutes"],0,"High Temperature Short Time pasteurization is 72 °C for 15 s. 63 °C for 30 min is the batch (LTLT) method.","HTST पाश्चुरीकरण 72 °C पर 15 सेकंड के लिए होता है।"],
+["Food Technology","The Maillard browning reaction occurs between:",["Reducing sugars and amino groups","Fats and water","Starch and iodine","Proteins and metal ions"],0,"Maillard browning is a non-enzymatic reaction between reducing sugars and amino groups of amino acids or proteins on heating.","मैलार्ड अभिक्रिया अपचायी शर्करा और अमीनो समूह के बीच होती है।"],
+["Food Technology","The water activity (aw) of pure water is:",["1.0","0","0.5","100"],0,"Water activity is the ratio of vapour pressure of the food to that of pure water, so pure water has aw = 1.0.","जल सक्रियता खाद्य और शुद्ध जल के वाष्प दाब का अनुपात है; शुद्ध जल के लिए 1.0।"],
+["Food Technology","Which enzyme in rennet coagulates milk during cheese making?",["Chymosin","Pepsin","Lipase","Amylase"],0,"Chymosin cleaves kappa-casein, destabilising casein micelles so milk curdles.","काइमोसिन कैपा-केसीन को तोड़कर दूध को जमाता है।"]
+];
+var FULL_COUNT=65,FULL_MINUTES=180;
+var $=function(i){return document.getElementById(i)},subj="Chemistry",set=[],idx=0,t0=0,tick=null,cur=null,answers=[],chosen=-1;
+function mine(){try{return JSON.parse(localStorage.getItem("gmine")||"[]")}catch(e){return[]}}
+function allQ(){return BANK.concat(mine())}
+function pool(){return subj==="Full"?allQ():allQ().filter(function(q){return q[0]===subj})}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x}return a}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function buildSubjects(){
+ var names=[["Chemistry","Chemistry"],["Biochemistry","Biochemistry"],["Botany","Botany"],["Microbiology","Microbiology"],["Zoology","Zoology"],["Food Technology","Food Technology"],["Full","Full length GATE XL"]];
+ $("subjects").innerHTML="";
+ names.forEach(function(p){var b=document.createElement("button");b.textContent=p[1];b.className=p[0]===subj?"sel":"";
+  b.onclick=function(){subj=p[0];if(subj==="Full")$("n").value=Math.min(FULL_COUNT,pool().length);buildSubjects()};$("subjects").appendChild(b)});
+ upd();
+}
+function upd(){$("avail").textContent=pool().length+" questions available in this section."+(subj==="Full"?" Full length uses up to "+FULL_COUNT+" questions with a "+FULL_MINUTES+" minute timer. Check the official GATE XL pattern and add more questions to match it.":"")}
+document.querySelectorAll("[data-n]").forEach(function(b){b.onclick=function(){$("n").value=b.dataset.n}});
+function show(id){["setup","quiz","result"].forEach(function(x){$(x).classList.toggle("hide",x!==id)})}
+function start(){
+ var p=pool(),n=Math.max(1,parseInt($("n").value)||10);
+ if(!p.length){$("avail").textContent="No questions in this section yet. Add some below.";return}
+ n=Math.min(n,p.length);if(subj==="Full")n=Math.min(n,FULL_COUNT);
+ set=shuffle(p).slice(0,n);idx=0;answers=[];t0=Date.now();
+ clearInterval(tick);tick=setInterval(clock,1000);clock();show("quiz");render();
+}
+function clock(){var s=Math.floor((Date.now()-t0)/1000);
+ if(subj==="Full"){var left=FULL_MINUTES*60-s;if(left<=0){finish();return}s=left}
+ var m=Math.floor(s/60),r=s%60;$("tm").textContent=(subj==="Full"?"Time left ":"Time ")+m+":"+(r<10?"0":"")+r}
+function render(){
+ var q=set[idx];chosen=-1;
+ cur={o:shuffle(q[2].map(function(t,i){return{t:t,c:i===q[3]}})),q:q};
+ $("prog").textContent="Question "+(idx+1)+" of "+set.length+" ("+q[0]+")";
+ $("pb").style.width=(idx/set.length*100)+"%";$("qt").textContent=q[1];
+ $("opts").innerHTML="";
+ cur.o.forEach(function(x,i){var b=document.createElement("button");b.className="opt";b.textContent=(i+1)+". "+x.t;b.onclick=function(){pick(i)};$("opts").appendChild(b)});
+ $("next").textContent=idx===set.length-1?"Finish (Enter)":"Next (Enter)";
+}
+function pick(i){chosen=i;var bs=$("opts").children;for(var k=0;k<bs.length;k++)bs[k].classList.toggle("on",k===i)}
+function next(){
+ var o=cur.o,right=o.filter(function(x){return x.c})[0].t;
+ answers.push({q:cur.q[1],sub:cur.q[0],yours:chosen<0?null:o[chosen].t,right:right,ok:chosen>=0&&o[chosen].c,en:cur.q[4]||"",hi:cur.q[5]||""});
+ idx++;if(idx>=set.length)finish();else render();
+}
+function finish(){
+ clearInterval(tick);
+ if(!$("quiz").classList.contains("hide")&&answers.length<set.length&&idx<set.length&&answers.length===idx){
+  /* timer ended: record current question as is */
+  var o=cur.o,right=o.filter(function(x){return x.c})[0].t;
+  answers.push({q:cur.q[1],sub:cur.q[0],yours:chosen<0?null:o[chosen].t,right:right,ok:chosen>=0&&o[chosen].c,en:cur.q[4]||"",hi:cur.q[5]||""});
+ }
+ var s=Math.floor((Date.now()-t0)/1000),tot=set.length,score=answers.filter(function(a){return a.ok}).length,att=answers.filter(function(a){return a.yours!==null}).length;
+ $("sc").textContent=score+" / "+tot;
+ $("sb").textContent=Math.round(score/tot*100)+"% correct. Attempted "+att+", wrong "+(att-score)+", not answered "+(tot-att)+".";
+ $("tk").textContent="Time taken: "+Math.floor(s/60)+" min "+(s%60)+" sec";
+ var by={};answers.forEach(function(a){by[a.sub]=by[a.sub]||[0,0];by[a.sub][1]++;if(a.ok)by[a.sub][0]++});
+ var h="<b>Section-wise score</b><br>"+Object.keys(by).map(function(k){return esc(k)+": "+by[k][0]+"/"+by[k][1]}).join("<br>")+"<br><br><b>Review with explanations / समीक्षा और व्याख्या</b>";
+ answers.forEach(function(a,i){
+  h+='<div class="rev"><b>'+(i+1)+". "+esc(a.q)+'</b><br>'+
+  (a.ok?'<span class="t">Your answer (correct): '+esc(a.right)+'</span>':
+   '<span class="f">Your answer: '+(a.yours===null?"Not answered":esc(a.yours))+'</span><br><span class="t">Correct answer: '+esc(a.right)+'</span>')+
+  (a.en||a.hi?'<div class="exp">'+(a.en?'<b>Why:</b> '+esc(a.en):'')+(a.hi?'<br><b>क्यों:</b> '+esc(a.hi):'')+'</div>':'')+'</div>'});
+ $("rev").innerHTML=h;show("result");window.scrollTo(0,0);
+}
+$("start").onclick=start;$("next").onclick=next;$("again").onclick=function(){show("setup");upd()};
+document.addEventListener("keydown",function(e){
+ if(!$("setup").classList.contains("hide")){if(e.key==="Enter"&&e.target.tagName!=="TEXTAREA"&&e.target.tagName!=="BUTTON"){e.preventDefault();start()}return}
+ if(!$("quiz").classList.contains("hide")){
+  if(e.key==="Enter"){e.preventDefault();next()}
+  else if(/^[1-4]$/.test(e.key)){var i=+e.key-1;if(i<cur.o.length)pick(i)}
+ }});
+$("add").onclick=function(){
+ var secs=["Chemistry","Biochemistry","Botany","Microbiology","Zoology","Food Technology"],ok=0,bad=0,m=mine();
+ $("imp").value.split("\n").forEach(function(l){if(!l.trim())return;var p=l.split("|").map(function(x){return x.trim()});
+  var s=secs.filter(function(x){return x.toLowerCase()===(p[0]||"").toLowerCase()})[0],a=parseInt(p[6]);
+  if(p.length>=7&&s&&a>=1&&a<=4&&p[1]&&p.slice(2,6).every(Boolean)){var o=p.slice(2,6),c=o[a-1];o.splice(a-1,1);o.unshift(c);m.push([s,p[1],o,0,p[7]||"",p[8]||""]);ok++}else bad++});
+ var msg="";try{localStorage.setItem("gmine",JSON.stringify(m))}catch(e){msg=" This browser blocked saving, so they will not be kept."}
+ $("impmsg").textContent=ok+" added, "+bad+" line(s) skipped (check the format)."+msg;if(ok)$("imp").value="";upd();
+};
+$("clr").onclick=function(){try{localStorage.removeItem("gmine")}catch(e){}$("impmsg").textContent="Your added questions were removed.";upd()};
+buildSubjects();
+</script>
+</body>
+</html>
