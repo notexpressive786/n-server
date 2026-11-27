@@ -1,0 +1,885 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JSON to MCQ Converter</title>
+
+<!-- PDF generation library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
+
+<style>
+/* =====================================================
+   1. GENERAL PAGE STYLING
+===================================================== */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    background: #f3f5f9;
+    color: #202938;
+}
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+header h1 {
+    color: #244c91;
+}
+
+.panel {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 12px #0000000d;
+}
+
+button, select {
+    padding: 11px 16px;
+    border: 0;
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+button {
+    background: #2855a3;
+    color: white;
+    margin: 5px 4px 5px 0;
+}
+
+button:hover {
+    opacity: 0.88;
+}
+
+button:disabled {
+    background: #999;
+    cursor: not-allowed;
+}
+
+input[type="file"] {
+    display: block;
+    margin: 15px 0;
+}
+
+select {
+    border: 1px solid #ccc;
+    background: white;
+    width: 100%;
+    max-width: 400px;
+}
+
+/* =====================================================
+   2. QUESTION CARD
+===================================================== */
+.question-card {
+    background: white;
+    padding: 22px;
+    margin: 18px 0;
+    border-radius: 10px;
+    border: 1px solid #e1e5ec;
+}
+
+.question-title {
+    font-weight: bold;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.option {
+    display: block;
+    padding: 12px;
+    margin: 9px 0;
+    border: 1px solid #d9dfe8;
+    border-radius: 7px;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.option:hover {
+    background: #f0f5ff;
+}
+
+.option.selected {
+    background: #e4edff;
+    border-color: #2855a3;
+}
+
+.option.correct {
+    background: #d9f5e2;
+    border-color: #23964b;
+}
+
+.option.wrong {
+    background: #ffe0e0;
+    border-color: #d33;
+}
+
+.explanation {
+    display: none;
+    background: #f4f7fc;
+    padding: 13px;
+    margin-top: 12px;
+    border-radius: 7px;
+    line-height: 1.6;
+}
+
+.score {
+    font-size: 22px;
+    font-weight: bold;
+    color: #205c37;
+}
+
+.hidden {
+    display: none;
+}
+
+#status {
+    color: #287044;
+    font-weight: bold;
+}
+
+@media print {
+    button, input, select {
+        display: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+    <h1>JSON to MCQ Converter</h1>
+    <p>Upload your question bank, attempt quizzes and generate PDFs.</p>
+</header>
+
+<!-- =====================================================
+     3. JSON FILE UPLOAD
+===================================================== -->
+<section class="panel">
+    <h2>Upload Question Bank</h2>
+
+    <input type="file" id="jsonFile" accept=".json,application/json">
+
+    <p id="status">Please upload your JSON question bank.</p>
+
+    <label for="chapterSelect"><b>Select Chapter:</b></label>
+    <br><br>
+
+    <select id="chapterSelect" disabled>
+        <option value="all">All Chapters</option>
+    </select>
+
+    <p id="questionCount">No questions loaded.</p>
+</section>
+
+<!-- =====================================================
+     4. PDF DOWNLOAD CONTROLS
+===================================================== -->
+<section class="panel">
+    <h2>Download Question Bank</h2>
+
+    <button onclick="downloadQuestionPDF()">
+        Download Questions PDF
+    </button>
+
+    <button onclick="downloadAnswerPDF()">
+        Download Answer Key PDF
+    </button>
+</section>
+
+<!-- =====================================================
+     5. QUIZ CONTROLS
+===================================================== -->
+<section class="panel">
+    <h2>Attempt MCQ Test</h2>
+
+    <button id="startBtn" onclick="startQuiz()" disabled>
+        Start Quiz
+    </button>
+
+    <button id="submitBtn" onclick="submitQuiz()" disabled>
+        Submit Test
+    </button>
+
+    <button id="resetBtn" onclick="resetQuiz()" disabled>
+        Reset Test
+    </button>
+
+    <div id="result" class="hidden"></div>
+</section>
+
+<!-- =====================================================
+     6. QUESTION DISPLAY AREA
+===================================================== -->
+<section id="quizArea"></section>
+
+</div>
+
+<script>
+
+/* =====================================================
+   7. GLOBAL VARIABLES
+===================================================== */
+
+// Stores all questions extracted from uploaded JSON.
+let allQuestions = [];
+
+// Stores questions selected for the current quiz.
+let quizQuestions = [];
+
+// Stores the user's selected answers.
+let userAnswers = {};
+
+// Tracks whether the test has been submitted.
+let submitted = false;
+
+
+/* =====================================================
+   8. JSON UPLOAD AND PROCESSING
+===================================================== */
+
+document.getElementById("jsonFile").addEventListener("change", function(event) {
+
+    const file = event.target.files[0];
+
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function(e) {
+
+        try {
+
+            const jsonData = JSON.parse(e.target.result);
+
+            // Extract questions from the JSON structure.
+            allQuestions = extractQuestions(jsonData);
+
+            if (allQuestions.length === 0) {
+                throw new Error("No MCQs found in the JSON file.");
+            }
+
+            populateChapters();
+
+            document.getElementById("status").textContent =
+                "Question bank uploaded successfully!";
+
+            document.getElementById("chapterSelect").disabled = false;
+            document.getElementById("startBtn").disabled = false;
+
+            updateQuestionCount();
+
+        } catch(error) {
+
+            alert("Error reading JSON: " + error.message);
+
+        }
+
+    };
+
+    reader.readAsText(file);
+
+});
+
+
+/* =====================================================
+   9. EXTRACT QUESTIONS FROM JSON
+   Supports:
+   chapters > topics > questions
+   and a simple questions array.
+===================================================== */
+
+function extractQuestions(data) {
+
+    let output = [];
+
+    function readQuestion(q, chapter, topic) {
+
+        if (!q || typeof q !== "object") return;
+
+        const questionText =
+            q.question || q.question_text || q.stem;
+
+        if (!questionText) return;
+
+        output.push({
+
+            chapter: chapter || q.chapter_name || q.chapter || "General",
+
+            topic: topic || q.topic_name || q.topic || "General",
+
+            number: q.question_number || q.number || output.length + 1,
+
+            question: questionText,
+
+            options: normalizeOptions(q.options),
+
+            answer: q.answer ?? q.correct_answer ?? q.answer_key ?? null,
+
+            explanation: q.explanation || q.solution || "",
+
+            exam: q.exam_tag || q.exam || ""
+
+        });
+
+    }
+
+    function normalizeOptions(options) {
+
+        if (!options) return {};
+
+        if (Array.isArray(options)) {
+
+            const result = {};
+
+            options.forEach((option, index) => {
+
+                const key = ["A", "B", "C", "D", "E", "F"][index];
+
+                if (key) {
+                    result[key] =
+                        typeof option === "object"
+                        ? option.text || option.value || ""
+                        : option;
+                }
+
+            });
+
+            return result;
+
+        }
+
+        return options;
+
+    }
+
+    function readNode(node, chapter = "General", topic = "General") {
+
+        if (Array.isArray(node)) {
+
+            node.forEach(item => readNode(item, chapter, topic));
+
+            return;
+        }
+
+        if (!node || typeof node !== "object") return;
+
+        if (node.question || node.question_text || node.stem) {
+
+            readQuestion(node, chapter, topic);
+
+            return;
+        }
+
+        if (Array.isArray(node.questions)) {
+
+            node.questions.forEach(q => readQuestion(q, chapter, topic));
+
+        }
+
+        if (Array.isArray(node.chapters)) {
+
+            node.chapters.forEach(ch => {
+
+                readNode(
+                    ch,
+                    ch.chapter_name || ch.name || ch.title || chapter,
+                    "General"
+                );
+
+            });
+
+        }
+
+        if (Array.isArray(node.topics)) {
+
+            node.topics.forEach(tp => {
+
+                readNode(
+                    tp,
+                    chapter,
+                    tp.topic_name || tp.name || tp.title || topic
+                );
+
+            });
+
+        }
+
+        // Supports other nested question-bank structures.
+        Object.keys(node).forEach(key => {
+
+            if (
+                ["questions", "chapters", "topics"].includes(key)
+            ) return;
+
+            const value = node[key];
+
+            if (Array.isArray(value)) {
+                value.forEach(item => readNode(item, chapter, topic));
+            }
+
+        });
+
+    }
+
+    if (Array.isArray(data)) {
+
+        readNode(data);
+
+    } else {
+
+        readNode(data);
+
+    }
+
+    return output;
+}
+
+
+/* =====================================================
+   10. POPULATE CHAPTER DROPDOWN
+===================================================== */
+
+function populateChapters() {
+
+    const select = document.getElementById("chapterSelect");
+
+    select.innerHTML = '<option value="all">All Chapters</option>';
+
+    const chapters = [...new Set(
+        allQuestions.map(q => q.chapter)
+    )];
+
+    chapters.forEach(chapter => {
+
+        const option = document.createElement("option");
+
+        option.value = chapter;
+        option.textContent = chapter;
+
+        select.appendChild(option);
+
+    });
+
+    select.onchange = updateQuestionCount;
+}
+
+
+/* =====================================================
+   11. UPDATE QUESTION COUNT
+===================================================== */
+
+function updateQuestionCount() {
+
+    const chapter = document.getElementById("chapterSelect").value;
+
+    const filtered = chapter === "all"
+        ? allQuestions
+        : allQuestions.filter(q => q.chapter === chapter);
+
+    document.getElementById("questionCount").textContent =
+        filtered.length + " questions available.";
+
+}
+
+
+/* =====================================================
+   12. START QUIZ
+===================================================== */
+
+function startQuiz() {
+
+    const chapter = document.getElementById("chapterSelect").value;
+
+    quizQuestions = chapter === "all"
+        ? [...allQuestions]
+        : allQuestions.filter(q => q.chapter === chapter);
+
+    userAnswers = {};
+    submitted = false;
+
+    document.getElementById("result").classList.add("hidden");
+
+    document.getElementById("submitBtn").disabled = false;
+    document.getElementById("resetBtn").disabled = false;
+
+    renderQuestions();
+
+}
+
+
+/* =====================================================
+   13. DISPLAY QUESTIONS AND OPTIONS
+===================================================== */
+
+function renderQuestions() {
+
+    const area = document.getElementById("quizArea");
+
+    area.innerHTML = "";
+
+    quizQuestions.forEach((q, index) => {
+
+        const card = document.createElement("div");
+
+        card.className = "question-card";
+
+        const title = document.createElement("div");
+
+        title.className = "question-title";
+
+        title.textContent =
+            `${index + 1}. ${q.question}`;
+
+        card.appendChild(title);
+
+        if (q.exam) {
+
+            const tag = document.createElement("small");
+
+            tag.textContent = "Exam: " + q.exam;
+
+            card.appendChild(tag);
+
+        }
+
+        Object.entries(q.options).forEach(([key, value]) => {
+
+            const label = document.createElement("label");
+
+            label.className = "option";
+
+            label.dataset.key = key;
+
+            label.textContent = `${key}. ${value}`;
+
+            label.onclick = function() {
+
+                if (submitted) return;
+
+                userAnswers[index] = key;
+
+                // Remove previous selection.
+                card.querySelectorAll(".option").forEach(option => {
+                    option.classList.remove("selected");
+                });
+
+                label.classList.add("selected");
+
+            };
+
+            card.appendChild(label);
+
+        });
+
+        const explanation = document.createElement("div");
+
+        explanation.className = "explanation";
+
+        explanation.textContent = q.explanation
+            ? "Explanation: " + q.explanation
+            : "No explanation available in the source.";
+
+        explanation.id = "explanation-" + index;
+
+        card.appendChild(explanation);
+
+        area.appendChild(card);
+
+    });
+
+}
+
+
+/* =====================================================
+   14. CHECK ANSWERS AND CALCULATE SCORE
+===================================================== */
+
+function submitQuiz() {
+
+    if (submitted) return;
+
+    if (!confirm("Are you sure you want to submit the test?")) {
+        return;
+    }
+
+    submitted = true;
+
+    let correct = 0;
+    let wrong = 0;
+    let unanswered = 0;
+
+    quizQuestions.forEach((q, index) => {
+
+        const selected = userAnswers[index];
+
+        const answer = normalizeAnswer(q.answer);
+
+        const options = document.querySelectorAll(
+            `#quizArea .question-card:nth-child(${index + 1}) .option`
+        );
+
+        if (!selected) {
+
+            unanswered++;
+
+        } else if (answer && selected === answer) {
+
+            correct++;
+
+        } else if (answer) {
+
+            wrong++;
+
+        }
+
+        options.forEach(option => {
+
+            const key = option.dataset.key;
+
+            if (answer && key === answer) {
+                option.classList.add("correct");
+            }
+
+            if (selected === key && answer && selected !== answer) {
+                option.classList.add("wrong");
+            }
+
+        });
+
+        document.getElementById("explanation-" + index).style.display =
+            "block";
+
+    });
+
+    const score = document.getElementById("result");
+
+    score.classList.remove("hidden");
+
+    score.innerHTML = `
+        <div class="score">Test Result</div>
+        <p>Correct: ${correct}</p>
+        <p>Wrong: ${wrong}</p>
+        <p>Unanswered: ${unanswered}</p>
+        <h3>Total Score: ${correct} / ${quizQuestions.length}</h3>
+    `;
+
+    document.getElementById("submitBtn").disabled = true;
+
+}
+
+
+/* =====================================================
+   15. NORMALIZE ANSWER FORMAT
+   Supports A, a, Option A and similar formats.
+===================================================== */
+
+function normalizeAnswer(answer) {
+
+    if (answer === null || answer === undefined) return "";
+
+    let value = String(answer).trim().toUpperCase();
+
+    const match = value.match(/^(?:OPTION\s*)?([A-F])(?:[\).:]|$)/);
+
+    return match ? match[1] : value;
+
+}
+
+
+/* =====================================================
+   16. RESET QUIZ
+===================================================== */
+
+function resetQuiz() {
+
+    if (!confirm("Reset this test?")) return;
+
+    userAnswers = {};
+    submitted = false;
+
+    document.getElementById("result").classList.add("hidden");
+
+    document.getElementById("submitBtn").disabled = false;
+
+    renderQuestions();
+
+}
+
+
+/* =====================================================
+   17. CREATE PDF HELPER
+===================================================== */
+
+function createPDF(title) {
+
+    const { jsPDF } = window.jspdf;
+
+    const pdf = new jsPDF();
+
+    let y = 20;
+
+    pdf.setFontSize(17);
+
+    pdf.text(title, 15, y);
+
+    y += 12;
+
+    pdf.setFontSize(10);
+
+    function addText(text) {
+
+        const lines = pdf.splitTextToSize(
+            String(text ?? ""),
+            175
+        );
+
+        const requiredHeight = lines.length * 5 + 3;
+
+        if (y + requiredHeight > 280) {
+
+            pdf.addPage();
+
+            y = 20;
+
+        }
+
+        pdf.text(lines, 15, y);
+
+        y += requiredHeight;
+
+    }
+
+    return {
+        pdf,
+        addText
+    };
+
+}
+
+
+/* =====================================================
+   18. DOWNLOAD QUESTIONS PDF
+===================================================== */
+
+function downloadQuestionPDF() {
+
+    if (!allQuestions.length) {
+        alert("Upload a JSON file first.");
+        return;
+    }
+
+    const chapter = document.getElementById("chapterSelect").value;
+
+    const questions = chapter === "all"
+        ? allQuestions
+        : allQuestions.filter(q => q.chapter === chapter);
+
+    const { pdf, addText } = createPDF("MCQ QUESTION BANK");
+
+    let previousChapter = "";
+
+    questions.forEach((q, index) => {
+
+        if (q.chapter !== previousChapter) {
+
+            addText("");
+            addText("CHAPTER: " + q.chapter);
+
+            previousChapter = q.chapter;
+
+        }
+
+        if (q.topic) {
+            addText("Topic: " + q.topic);
+        }
+
+        addText((index + 1) + ". " + q.question);
+
+        if (q.exam) {
+            addText("Exam: " + q.exam);
+        }
+
+        Object.entries(q.options).forEach(([key, value]) => {
+
+            addText(key + ". " + value);
+
+        });
+
+        addText("");
+
+    });
+
+    pdf.save("MCQ_Question_Bank.pdf");
+
+}
+
+
+/* =====================================================
+   19. DOWNLOAD ANSWER KEY PDF
+===================================================== */
+
+function downloadAnswerPDF() {
+
+    if (!allQuestions.length) {
+        alert("Upload a JSON file first.");
+        return;
+    }
+
+    const chapter = document.getElementById("chapterSelect").value;
+
+    const questions = chapter === "all"
+        ? allQuestions
+        : allQuestions.filter(q => q.chapter === chapter);
+
+    const { pdf, addText } = createPDF("MCQ ANSWER KEY");
+
+    let previousChapter = "";
+
+    questions.forEach((q, index) => {
+
+        if (q.chapter !== previousChapter) {
+
+            addText("");
+            addText("CHAPTER: " + q.chapter);
+
+            previousChapter = q.chapter;
+
+        }
+
+        addText(
+            (index + 1) + ". Answer: " +
+            (q.answer ?? "Not provided")
+        );
+
+        if (q.explanation) {
+            addText("Explanation: " + q.explanation);
+        }
+
+    });
+
+    pdf.save("MCQ_Answer_Key.pdf");
+
+}
+
+</script>
+
+</body>
+</html>
