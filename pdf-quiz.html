@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MCQ Quiz</title>
+<style>
+body{margin:0;padding:12px;font:16px/1.5 Georgia,'Noto Serif Devanagari',serif;background:#f3f6f4;color:#16302b}
+.w{max-width:720px;margin:auto}.c{background:#fff;border:1px solid #cfdcd7;border-radius:10px;padding:16px;margin:0 0 12px}
+button{font:inherit;padding:9px 13px;border:1px solid #cfdcd7;background:#fff;color:inherit;border-radius:8px;cursor:pointer}
+button.s{background:#0f6b5c;color:#fff;border-color:#0f6b5c}.big{width:100%;margin-top:12px;padding:13px;font-weight:bold}
+.r{display:flex;flex-wrap:wrap;gap:8px}.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px}
+.opt.on{background:#e9f3f0;border-color:#0f6b5c;font-weight:bold}input{font:inherit;width:90px;padding:8px;border:1px solid #b9cbc5;border-radius:8px}
+.n{color:#5b706b;font-size:.88rem}.t{color:#1b7f3b}.f{color:#b3261e}.hide{display:none}
+.tag{display:inline-block;font-size:.8rem;padding:1px 8px;border-radius:10px;border:1px solid #0f6b5c;color:#0f6b5c}.tag.ai{border-color:#8a5a00;color:#8a5a00}
+.ex{background:#e9f3f0;border-radius:8px;padding:8px 10px;margin-top:6px}.rev{border-top:1px solid #cfdcd7;padding:12px 0}
+</style></head><body><div class="w">
+<h1>MCQ Quiz</h1>
+<div id="setup" class="c">
+ <p id="msg" class="n">Loading questions…</p>
+ <div class="r" id="subs"></div>
+ <p><label>Number of questions <input id="n" type="number" min="1" value="10"></label>
+ <label><input type="checkbox" id="tm"> Timer</label></p>
+ <button class="s big" id="go">Start quiz (Enter)</button>
+ <p class="n">No bank found? Load a file: <input type="file" id="f" accept=".json" style="width:auto"></p>
+</div>
+<div id="quiz" class="c hide"><div class="n" id="pr"></div><p id="q" style="font-size:1.15rem"></p><div id="o"></div>
+ <button class="s big" id="nx">Next (Enter)</button><p class="n">Keys 1-4 choose, Enter next. Answers appear at the end.</p></div>
+<div id="res" class="hide"><div class="c"><h2 id="sc" style="margin:0"></h2><p id="sb"></p><button class="s big" id="again">New quiz</button></div><div class="c" id="rev"></div></div>
+</div>
+<script>
+/* Quiz page. Reads questions-bank.json (written by pdf-to-mcq.html) from the same folder.
+   Bank item: {exam,subject,year,source,page,type,stem,options[4],answer(0-3),expEn,expHi}
+   type: "official-pyq" | "authorized" | "ai-practice"  -> shown to students as a label, never mixed up. */
+var $=function(i){return document.getElementById(i)},bank=[],subj='All',set=[],i=0,ans=[],cho=-1,cur=null,t0=0,tk=null;
+var LABEL={'official-pyq':'Official PYQ','authorized':'Practice (authorized source)','ai-practice':'AI-generated practice'};
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function shuf(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),x=a[k];a[k]=a[j];a[j]=x}return a}
+function load(b){bank=(b||[]).filter(function(q){return q&&q.stem&&q.options&&q.options.length===4&&q.answer>=0&&q.answer<4});buttons()}
+fetch('questions-bank.json').then(function(r){if(!r.ok)throw 0;return r.json()}).then(load)
+ .catch(function(){try{load(JSON.parse(localStorage.getItem('mcqBank')||'[]'))}catch(e){load([])}});
+$('f').onchange=function(){var r=new FileReader();r.onload=function(){try{load(JSON.parse(r.result))}catch(e){$('msg').textContent='Not a valid bank file.'}};r.readAsText(this.files[0])};
+function pool(){return bank.filter(function(q){return subj==='All'||q.subject===subj})}
+function buttons(){var s=['All'].concat(bank.map(function(q){return q.subject}).filter(function(v,k,a){return a.indexOf(v)===k}));
+ $('subs').innerHTML='';s.forEach(function(x){var b=document.createElement('button');b.textContent=x;if(x===subj)b.className='s';b.onclick=function(){subj=x;buttons()};$('subs').appendChild(b)});
+ $('msg').textContent=bank.length?pool().length+' questions in this selection.':'No questions loaded yet.'}
+function show(id){['setup','quiz','res'].forEach(function(x){$(x).classList.toggle('hide',x!==id)})}
+function start(){var p=pool();if(!p.length)return;set=shuf(p).slice(0,Math.max(1,parseInt($('n').value)||10));i=0;ans=[];t0=Date.now();
+ clearInterval(tk);if($('tm').checked)tk=setInterval(function(){var s=Math.floor((Date.now()-t0)/1000);$('pr').dataset.t=Math.floor(s/60)+':'+('0'+s%60).slice(-2);head()},1000);show('quiz');draw()}
+function head(){$('pr').textContent='Question '+(i+1)+' of '+set.length+($('pr').dataset.t&&$('tm').checked?'  |  '+$('pr').dataset.t:'')}
+function draw(){var q=set[i];cho=-1;cur={q:q,o:shuf(q.options.map(function(t,k){return{t:t,c:k===q.answer}}))};head();$('q').textContent=q.stem;$('o').innerHTML='';
+ cur.o.forEach(function(x,k){var b=document.createElement('button');b.className='opt';b.textContent=(k+1)+'. '+x.t;b.onclick=function(){pick(k)};$('o').appendChild(b)});
+ $('nx').textContent=i===set.length-1?'Finish (Enter)':'Next (Enter)'}
+function pick(k){cho=k;[].forEach.call($('o').children,function(b,j){b.classList.toggle('on',j===k)})}
+function next(){var r=cur.o.filter(function(x){return x.c})[0].t;ans.push({q:cur.q,yours:cho<0?null:cur.o[cho].t,right:r,ok:cho>=0&&cur.o[cho].c});i++;if(i>=set.length)end();else draw()}
+function end(){clearInterval(tk);var sc=ans.filter(function(a){return a.ok}).length,at=ans.filter(function(a){return a.yours!==null}).length;
+ $('sc').textContent=sc+' / '+set.length;$('sb').textContent=Math.round(sc/set.length*100)+'% correct. Wrong '+(at-sc)+', not answered '+(set.length-at)+'. Time '+Math.floor((Date.now()-t0)/60000)+' min.';
+ $('rev').innerHTML='<b>Review</b>'+ans.map(function(a,k){var q=a.q;return '<div class="rev"><span class="tag'+(q.type==='ai-practice'?' ai':'')+'">'+LABEL[q.type]+'</span> <span class="n">'+esc(q.source||'')+(q.page?', page '+esc(q.page):'')+(q.year?' ('+esc(q.year)+')':'')+'</span><br><b>'+(k+1)+'. '+esc(q.stem)+'</b><br>'+
+  (a.ok?'<span class="t">Correct: '+esc(a.right)+'</span>':'<span class="f">Your answer: '+(a.yours===null?'not answered':esc(a.yours))+'</span><br><span class="t">Correct: '+esc(a.right)+'</span>')+
+  (q.expEn||q.expHi?'<div class="ex">'+(q.expEn?'<b>Why:</b> '+esc(q.expEn):'')+(q.expHi?'<br><b>क्यों:</b> '+esc(q.expHi):'')+'</div>':'')+'</div>'}).join('');show('res');scrollTo(0,0)}
+$('go').onclick=start;$('nx').onclick=next;$('again').onclick=function(){show('setup')};
+document.addEventListener('keydown',function(e){if(!$('setup').classList.contains('hide')){if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){e.preventDefault();start()}}
+ else if(!$('quiz').classList.contains('hide')){if(e.key==='Enter'){e.preventDefault();next()}else if(/^[1-4]$/.test(e.key)&&+e.key<=cur.o.length)pick(+e.key-1)}});
+</script></body></html>
