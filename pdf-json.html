@@ -1,0 +1,145 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <!-- Makes the converter responsive on mobile devices. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ExamShelf - PDF to MCQ JSON</title>
+
+    <!-- PDF.js library extracts selectable text from PDF documents. -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+    <!-- Tesseract.js provides OCR for scanned/image-based PDF pages. -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+
+    <!-- Loads the converter's stylesheet. -->
+    <link rel="stylesheet" href="pdf-json.css">
+</head>
+
+<body>
+
+<main class="container">
+
+    <!-- Page heading and introduction. -->
+    <header class="header">
+        <p class="eyebrow">EXAMSHELF ADMIN TOOL</p>
+        <h1>PDF to MCQ JSON Converter</h1>
+        <p>Upload a PDF, extract questions, review them and download JSON.</p>
+    </header>
+
+    <!-- PDF upload section. -->
+    <section class="panel">
+        <h2>1. Upload PDF</h2>
+
+        <div id="dropZone" class="drop-zone">
+            <h3>Drop your PDF here</h3>
+            <p>Or choose a file from your computer.</p>
+
+            <input id="pdfInput" type="file" accept=".pdf,application/pdf">
+
+            <button id="browseBtn" type="button">Choose PDF</button>
+        </div>
+
+        <p id="fileInfo"></p>
+
+        <!-- Metadata added to every exported question. -->
+        <div class="metadata">
+
+            <label>
+                Subject
+                <input id="subject" type="text" placeholder="Biology">
+            </label>
+
+            <label>
+                Chapter / Unit
+                <input id="chapter" type="text" placeholder="Cell Biology">
+            </label>
+
+            <label>
+                Exam
+                <input id="exam" type="text" placeholder="MP TET Varg 2">
+            </label>
+
+            <label>
+                Language
+                <select id="language">
+                    <option value="en">English</option>
+                    <option value="hi">Hindi</option>
+                    <option value="en-hi">English + Hindi</option>
+                    <option value="unknown">Unknown</option>
+                </select>
+            </label>
+
+        </div>
+
+        <!-- OCR is optional because it takes more processing time. -->
+        <label class="check">
+            <input id="useOCR" type="checkbox">
+            Enable OCR for scanned PDF pages
+        </label>
+
+        <label class="check">
+            <input id="includeUncertain" type="checkbox" checked>
+            Include questions needing review in JSON
+        </label>
+
+        <div class="actions">
+            <button id="extractBtn" disabled>Extract MCQs</button>
+            <button id="resetBtn" class="secondary">Reset</button>
+        </div>
+
+        <!-- Extraction progress indicator. -->
+        <div class="progress">
+            <div id="progressBar"></div>
+        </div>
+
+        <p id="status">Waiting for PDF...</p>
+
+    </section>
+
+    <!-- Question review section. -->
+    <section class="panel">
+
+        <div class="section-heading">
+            <h2>2. Review Questions</h2>
+            <span id="questionCount">0 questions</span>
+        </div>
+
+        <p class="hint">
+            Check the question, options and answer before approving it.
+        </p>
+
+        <div id="questionList"></div>
+
+        <button id="addQuestionBtn" class="secondary">
+            + Add Question Manually
+        </button>
+
+    </section>
+
+    <!-- JSON preview and download section. -->
+    <section class="panel">
+
+        <h2>3. JSON Output</h2>
+
+        <div class="actions">
+            <button id="previewBtn" class="secondary">Refresh Preview</button>
+            <button id="downloadBtn">Download JSON</button>
+        </div>
+
+        <pre id="jsonPreview">{
+  "questions": []
+}</pre>
+
+    </section>
+
+</main>
+
+<!-- Loads the converter's JavaScript. -->
+<script src="pdf-json.js"></script>
+
+</body>
+</html>
