@@ -1,0 +1,296 @@
+
+/* =====================================================
+   EXAMSHELF PDF TO JSON CONVERTER
+   Responsive styling for desktop and mobile screens.
+===================================================== */
+
+/* Global color variables make future theme changes easier. */
+:root {
+    --primary: #3157d5;
+    --primary-dark: #2445b5;
+    --background: #f4f6fb;
+    --surface: #ffffff;
+    --text: #182033;
+    --muted: #687386;
+    --border: #e1e6ef;
+}
+
+/* Reset default browser spacing and sizing. */
+* {
+    box-sizing: border-box;
+}
+
+/* Main page appearance. */
+body {
+    margin: 0;
+    padding: 25px 15px;
+    background: var(--background);
+    color: var(--text);
+    font-family: Arial, sans-serif;
+}
+
+/* Main content width. */
+.container {
+    width: 100%;
+    max-width: 1000px;
+    margin: auto;
+}
+
+/* Header styling. */
+.header {
+    margin-bottom: 25px;
+}
+
+.eyebrow {
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.header h1 {
+    margin-bottom: 8px;
+    font-size: 32px;
+}
+
+.header p {
+    color: var(--muted);
+}
+
+/* Reusable white panels. */
+.panel {
+    margin-bottom: 20px;
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0,0,0,.04);
+}
+
+/* PDF upload area. */
+.drop-zone {
+    margin: 20px 0;
+    padding: 35px 15px;
+    text-align: center;
+    border: 2px dashed #b9c6df;
+    border-radius: 12px;
+    background: #fafbff;
+}
+
+/* Highlight the upload area during drag-and-drop. */
+.drop-zone.dragover {
+    border-color: var(--primary);
+    background: #eef2ff;
+}
+
+/* Metadata fields use a responsive grid. */
+.metadata {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-top: 20px;
+}
+
+label {
+    display: block;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+/* Text inputs and dropdowns. */
+input[type="text"],
+select,
+textarea {
+    display: block;
+    width: 100%;
+    margin-top: 7px;
+    padding: 11px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font: inherit;
+    font-weight: normal;
+}
+
+/* Highlight active fields. */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: 2px solid #dbe4ff;
+    border-color: var(--primary);
+}
+
+/* Checkbox labels. */
+.check {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 17px;
+    color: #465168;
+    font-weight: normal;
+}
+
+.check input {
+    accent-color: var(--primary);
+}
+
+/* Buttons. */
+button {
+    padding: 11px 16px;
+    border: none;
+    border-radius: 8px;
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    background: var(--primary-dark);
+}
+
+button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.secondary {
+    background: #eef2ff;
+    color: var(--primary);
+}
+
+.secondary:hover {
+    background: #dfe6ff;
+}
+
+/* Group buttons together. */
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+/* Progress bar background. */
+.progress {
+    width: 100%;
+    height: 8px;
+    margin-top: 20px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: #e9edf5;
+}
+
+/* Progress bar fill. */
+#progressBar {
+    width: 0%;
+    height: 100%;
+    background: var(--primary);
+    transition: width .2s;
+}
+
+#status,
+.hint {
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* Question review heading. */
+.section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+#questionCount {
+    padding: 7px 11px;
+    border-radius: 20px;
+    background: #eef2ff;
+    color: var(--primary);
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Individual question card. */
+.question-card {
+    margin: 15px 0;
+    padding: 16px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+}
+
+/* Question card heading. */
+.question-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.question-number {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+/* Question editor fields. */
+.question-card textarea {
+    min-height: 65px;
+    resize: vertical;
+}
+
+.question-card label {
+    margin-top: 12px;
+}
+
+/* Review status indicator. */
+.review-status {
+    color: #946200;
+    font-size: 12px;
+}
+
+/* Remove question button. */
+.remove-btn {
+    background: transparent;
+    color: #b42318;
+    padding: 5px;
+}
+
+/* JSON preview area. */
+#jsonPreview {
+    max-height: 450px;
+    overflow: auto;
+    padding: 16px;
+    border-radius: 10px;
+    background: #111827;
+    color: #dce7f8;
+    font: 12px/1.6 monospace;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+/* Tablet and mobile layout. */
+@media (max-width: 600px) {
+
+    body {
+        padding: 15px 10px;
+    }
+
+    .panel {
+        padding: 16px;
+    }
+
+    .metadata {
+        grid-template-columns: 1fr;
+    }
+
+    .header h1 {
+        font-size: 25px;
+    }
+
+    .section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+}
