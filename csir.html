@@ -1,1 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSIR NET Life Sciences Practice Quiz</title>
+<style>
+:root{--bg:#f3f6f4;--card:#fff;--ink:#16302b;--mute:#5b706b;--line:#cfdcd7;--acc:#0f6b5c;--acc2:#e9f3f0;--ok:#1b7f3b;--bad:#b3261e}
+@media(prefers-color-scheme:dark){:root{--bg:#10201d;--card:#172a26;--ink:#e6f1ee;--mute:#9db5ae;--line:#2c4540;--acc:#4fc3ae;--acc2:#1f3a34;--ok:#6fd48c;--bad:#ff8f86}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Georgia,'Noto Serif Devanagari',serif;padding:12px}
+.wrap{max-width:720px;margin:0 auto}
+h1{font-size:1.5rem;margin:8px 0 2px}
+.sub{color:var(--mute);margin:0 0 14px;font-size:.95rem}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:12px}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:9px 12px}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px}
+.row button.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+.big{background:var(--acc);color:#fff;border-color:var(--acc);font-weight:bold;width:100%;margin-top:12px;padding:13px}
+input[type=number]{font:inherit;width:90px;padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink)}
+textarea{width:100%;min-height:90px;font:13px monospace;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px}
+label{display:block;font-weight:bold;margin:12px 0 6px}
+.note{color:var(--mute);font-size:.88rem}
+.top{display:flex;justify-content:space-between;gap:8px;color:var(--mute);font-size:.92rem}
+.bar{height:6px;background:var(--line);border-radius:3px;margin:8px 0 14px}
+.bar i{display:block;height:100%;background:var(--acc);border-radius:3px}
+.q{font-size:1.15rem;margin:0 0 12px}
+.opt{display:block;width:100%;text-align:left;margin:8px 0;padding:12px}
+.opt:hover{background:var(--acc2)}
+.opt.on{background:var(--acc2);border-color:var(--acc);font-weight:bold}
+.score{font-size:2.4rem;margin:0}
+.rev{border-top:1px solid var(--line);padding:12px 0}
+.t{color:var(--ok)}.f{color:var(--bad)}
+.exp{background:var(--acc2);border-radius:8px;padding:8px 10px;margin-top:6px;font-size:.95rem}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>CSIR NET Life Sciences practice</h1>
+<p class="sub">Works offline. Pick a unit, set the number of questions, press Enter. English and Hindi explanations appear after you finish.</p>
 
+<div id="setup">
+ <div class="card">
+  <label>Unit</label>
+  <div class="row" id="subjects"></div>
+  <label for="n">Number of questions</label>
+  <div class="row">
+   <input id="n" type="number" min="1" value="10" aria-label="Number of questions">
+   <button data-n="10">10</button><button data-n="25">25</button><button data-n="50">50</button><button data-n="75">75</button>
+  </div>
+  <p class="note" id="avail"></p>
+  <button class="big" id="start">Start quiz (Enter)</button>
+ </div>
+ <div class="card">
+  <label for="imp">Add your own questions (real PYQs)</label>
+  <p class="note">One per line: Unit number (1-13) | Question | A | B | C | D | Correct number (1-4) | English explanation | Hindi explanation. Saved in this browser.</p>
+  <textarea id="imp" placeholder="6 | Question? | opt A | opt B | opt C | opt D | 1 | Why it is right | सही क्यों है"></textarea>
+  <div class="row" style="margin-top:8px"><button id="add">Add questions</button><button id="clr">Remove my added questions</button></div>
+  <p class="note" id="impmsg"></p>
+ </div>
+</div>
+
+<div id="quiz" class="card hide">
+ <div class="top"><span id="prog"></span><span id="tm"></span></div>
+ <div class="bar"><i id="pb"></i></div>
+ <p class="q" id="qt"></p>
+ <div id="opts"></div>
+ <div class="row" style="margin-top:12px"><button id="next" class="big">Next (Enter)</button></div>
+ <p class="note">Keys: 1-4 to choose, Enter for next. You can change your choice or skip with Enter. Answers are shown at the end.</p>
+</div>
+
+<div id="result" class="hide">
+ <div class="card"><p class="score" id="sc"></p><p id="sb"></p><p id="tk" class="note"></p>
+ <button class="big" id="again">New quiz</button></div>
+ <div class="card" id="rev"></div>
+</div>
+</div>
+
+<script>
+var UNITS=["1. Molecules & interactions","2. Cellular organization","3. Fundamental processes","4. Cell communication & signaling","5. Developmental biology","6. Plant physiology","7. Animal physiology","8. Inheritance biology","9. Diversity of life forms","10. Ecological principles","11. Evolution & behavior","12. Applied biology","13. Methods in biology"];
+// Practice bank from the CSIR NET Life Sciences syllabus (not verified past papers). Format: [unit no, question, [options, correct FIRST], 0, English explanation, Hindi explanation]
+var BANK=[
+[1,"Which technique is widely used to estimate the secondary structure content of a protein in solution?",["Circular dichroism","Mass spectrometry","Southern blotting","Flow cytometry"],0,"CD spectra in the far-UV differ for alpha helix, beta sheet and random coil, so they report secondary structure.","Far-UV CD स्पेक्ट्रम अल्फा हेलिक्स, बीटा शीट और रैंडम कॉइल के लिए अलग होता है।"],
+[1,"A Ramachandran plot shows the allowed combinations of:",["Phi and psi angles","Omega angles only","Bond lengths","Chi angles of side chains"],0,"It plots backbone phi (N–Cα) and psi (Cα–C) torsion angles, showing sterically allowed regions.","यह पृष्ठ-शृंखला के phi और psi कोणों के अनुमत संयोजन दिखाता है।"],
+[2,"Which signal sequence retains soluble proteins in the ER lumen?",["KDEL","NLS","SKL","Mannose-6-phosphate"],0,"The C-terminal KDEL sequence is recognised by the KDEL receptor, which returns proteins from the Golgi to the ER.","C-सिरे का KDEL अनुक्रम प्रोटीन को ER में वापस लाता है।"],
+[2,"Which cytoskeletal filament shows dynamic instability?",["Microtubules","Intermediate filaments","Septins","Spectrin"],0,"Microtubules switch between growth and rapid shrinkage (catastrophe) driven by GTP-tubulin cap hydrolysis.","सूक्ष्मनलिकाएँ GTP हाइड्रोलिसिस के कारण वृद्धि और संकुचन के बीच बदलती रहती हैं।"],
+[3,"Telomerase adds telomeric repeats using:",["Its own RNA template","The lagging strand as template","A DNA primase","Okazaki fragments"],0,"Telomerase is a ribonucleoprotein; its RNA component templates reverse transcription of repeats.","टेलोमरेज़ अपने RNA घटक को टेम्पलेट बनाकर दोहराव जोड़ता है।"],
+[3,"The Shine–Dalgarno sequence in prokaryotic mRNA base-pairs with:",["16S rRNA","23S rRNA","5S rRNA","tRNA"],0,"It pairs with the 3' end of 16S rRNA in the 30S subunit to position the start codon.","यह 30S उप-इकाई के 16S rRNA से जुड़ता है।"],
+[4,"Activation of a GPCR leads to the exchange of which nucleotide on the G-alpha subunit?",["GDP for GTP","ATP for ADP","GTP for GDP","cAMP for AMP"],0,"The activated receptor acts as a GEF, so G-alpha releases GDP and binds GTP.","सक्रिय GPCR G-अल्फा पर GDP की जगह GTP लगवाता है।"],
+[4,"Along with Ca²⁺, which second messenger activates protein kinase C?",["Diacylglycerol (DAG)","IP3","cGMP","cAMP"],0,"PLC cleaves PIP2 into IP3 (releases Ca²⁺) and DAG, which with Ca²⁺ activates PKC.","DAG और Ca²⁺ मिलकर PKC को सक्रिय करते हैं।"],
+[5,"The Bicoid gradient in Drosophila embryos specifies the:",["Anterior–posterior axis","Dorsal–ventral axis","Left–right axis","Germ layers"],0,"Maternal bicoid mRNA is localised anteriorly; its protein gradient patterns the anterior–posterior axis.","बायकॉइड प्रवणता अग्र-पश्च अक्ष तय करती है।"],
+[5,"Which cell is totipotent?",["Zygote","Neuron","Hepatocyte","Erythrocyte"],0,"A zygote can give rise to all embryonic and extra-embryonic tissues; differentiated cells cannot.","युग्मनज सभी प्रकार की कोशिकाएँ बना सकता है।"],
+[6,"The physiologically active form of phytochrome is:",["Pfr","Pr","Cryptochrome","Phototropin"],0,"Red light converts inactive Pr to active Pfr; far-red light reverses it.","लाल प्रकाश निष्क्रिय Pr को सक्रिय Pfr में बदलता है।"],
+[6,"The immediate precursor of ethylene in plants is:",["ACC","Methionine","SAM","Tryptophan"],0,"Methionine → SAM → ACC (by ACC synthase) → ethylene (by ACC oxidase).","एथिलीन का तात्कालिक पूर्वगामी ACC है।"],
+[7,"Which hormone is released from the posterior pituitary?",["Oxytocin","FSH","Prolactin","Growth hormone"],0,"Oxytocin and ADH are made in the hypothalamus and released from the posterior pituitary.","ऑक्सीटोसिन पश्च पीयूष ग्रंथि से मुक्त होता है।"],
+[7,"The Bohr effect describes:",["Lower O₂ affinity of haemoglobin at lower pH","Higher O₂ affinity at lower pH","CO₂ binding to myoglobin","Effect of 2,3-BPG on myoglobin"],0,"Higher CO₂ or H⁺ shifts the O₂ dissociation curve right, aiding O₂ release in tissues.","कम pH पर हीमोग्लोबिन की O₂ बंधुता घटती है।"],
+[8,"A test cross involves crossing an individual of unknown genotype with:",["A homozygous recessive","A homozygous dominant","A heterozygote","Itself"],0,"Offspring phenotypes reveal the unknown genotype because the recessive parent contributes only recessive alleles.","अज्ञात जीनोटाइप का समयुग्मजी अप्रभावी से संकरण।"],
+[8,"A 9:3:4 ratio in the F2 indicates:",["Recessive epistasis","Dominant epistasis","Complementary genes","Duplicate genes"],0,"When homozygous recessive at one locus masks the other, 9:3:3:1 becomes 9:3:4.","अप्रभावी एपिस्टेसिस में 9:3:4 अनुपात आता है।"],
+[9,"Which phylum has a water vascular system?",["Echinodermata","Mollusca","Annelida","Cnidaria"],0,"Echinoderms use a water vascular system for locomotion, feeding and respiration.","इकाइनोडर्मेटा में जल संवहन तंत्र होता है।"],
+[9,"Ginkgo biloba belongs to:",["Gymnosperms","Angiosperms","Pteridophytes","Bryophytes"],0,"Ginkgo has naked seeds and is a gymnosperm.","जिन्कगो नग्नबीजी पौधा है।"],
+[10,"Species richness generally increases:",["Towards the equator","Towards the poles","With altitude","With latitude"],0,"The latitudinal diversity gradient shows the highest richness in the tropics.","विषुवत रेखा की ओर प्रजाति समृद्धि बढ़ती है।"],
+[10,"The 10 percent law of energy transfer between trophic levels was proposed by:",["Lindeman","Odum","Tansley","Haeckel"],0,"Lindeman (1942) proposed that roughly 10 percent of energy passes to the next trophic level.","10 प्रतिशत नियम लिंडमैन ने दिया।"],
+[11,"Hamilton's rule for kin selection states that an altruistic trait spreads when:",["rB > C","B > rC","r > BC","C > rB"],0,"The relatedness times the benefit to the recipient must exceed the cost to the actor.","सहजन्य चयन में rB > C होने पर परोपकारी लक्षण फैलता है।"],
+[11,"Genetic drift has the greatest effect in:",["Small populations","Large populations","Infinite populations","Populations with high migration"],0,"Random sampling of alleles causes larger frequency changes when population size is small.","छोटी जनसंख्या में आनुवंशिक विचलन अधिक होता है।"],
+[12,"Bt toxin used in insect-resistant crops comes from:",["Bacillus thuringiensis","Agrobacterium tumefaciens","Escherichia coli","Streptomyces"],0,"Cry proteins from B. thuringiensis are toxic to specific insect larvae.","Bt विष बैसिलस थुरिंजिएन्सिस से आता है।"],
+[12,"Which plasmid is used to transfer genes into plants?",["Ti plasmid","F plasmid","R plasmid","Col plasmid"],0,"Agrobacterium's Ti plasmid transfers T-DNA into plant cells.","पादप रूपांतरण में Ti प्लाज़्मिड प्रयुक्त होता है।"],
+[13,"The denaturation step of PCR is typically carried out at about:",["94–95 °C","55 °C","72 °C","37 °C"],0,"High temperature separates the DNA strands; annealing is ~55 °C and extension ~72 °C.","विकृतिकरण लगभग 94–95 °C पर होता है।"],
+[13,"Western blotting is used to detect:",["Specific proteins","DNA fragments","RNA molecules","Lipids"],0,"Proteins are separated, transferred to a membrane and probed with specific antibodies.","वेस्टर्न ब्लॉटिंग विशिष्ट प्रोटीन पहचानती है।"]
+];
+// Assumed full-length setting (check the official CSIR NET pattern)
+var FULL_COUNT=75,FULL_MINUTES=180;
+var $=function(i){return document.getElementById(i)},subj=1,set=[],idx=0,t0=0,tick=null,cur=null,answers=[],chosen=-1;
+function mine(){try{return JSON.parse(localStorage.getItem("cmine")||"[]")}catch(e){return[]}}
+function allQ(){return BANK.concat(mine())}
+function pool(){return subj==="Full"?allQ():allQ().filter(function(q){return q[0]===subj})}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var x=a[i];a[i]=a[j];a[j]=x}return a}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
+function buildSubjects(){
+ $("subjects").innerHTML="";
+ UNITS.map(function(u,i){return[i+1,u]}).concat([["Full","Full length CSIR NET"]]).forEach(function(p){
+  var b=document.createElement("button");b.textContent=p[1];b.className=p[0]===subj?"sel":"";
+  b.onclick=function(){subj=p[0];if(subj==="Full")$("n").value=Math.min(FULL_COUNT,pool().length);buildSubjects()};$("subjects").appendChild(b)});
+ upd();
+}
+function upd(){$("avail").textContent=pool().length+" questions available in this section."+(subj==="Full"?" Full length uses up to "+FULL_COUNT+" questions with a "+FULL_MINUTES+" minute timer. Check the official pattern and add more questions to match it.":"")}
+document.querySelectorAll("[data-n]").forEach(function(b){b.onclick=function(){$("n").value=b.dataset.n}});
+function show(id){["setup","quiz","result"].forEach(function(x){$(x).classList.toggle("hide",x!==id)})}
+function uname(q){return UNITS[q[0]-1]}
+function start(){
+ var p=pool(),n=Math.max(1,parseInt($("n").value)||10);
+ if(!p.length){$("avail").textContent="No questions in this section yet. Add some below.";return}
+ n=Math.min(n,p.length);if(subj==="Full")n=Math.min(n,FULL_COUNT);
+ set=shuffle(p).slice(0,n);idx=0;answers=[];t0=Date.now();
+ clearInterval(tick);tick=setInterval(clock,1000);clock();show("quiz");render();
+}
+function clock(){var s=Math.floor((Date.now()-t0)/1000);
+ if(subj==="Full"){var left=FULL_MINUTES*60-s;if(left<=0){finish();return}s=left}
+ var m=Math.floor(s/60),r=s%60;$("tm").textContent=(subj==="Full"?"Time left ":"Time ")+m+":"+(r<10?"0":"")+r}
+function render(){
+ var q=set[idx];chosen=-1;
+ cur={o:shuffle(q[2].map(function(t,i){return{t:t,c:i===q[3]}})),q:q};
+ $("prog").textContent="Question "+(idx+1)+" of "+set.length+" (Unit "+q[0]+")";
+ $("pb").style.width=(idx/set.length*100)+"%";$("qt").textContent=q[1];
+ $("opts").innerHTML="";
+ cur.o.forEach(function(x,i){var b=document.createElement("button");b.className="opt";b.textContent=(i+1)+". "+x.t;b.onclick=function(){pick(i)};$("opts").appendChild(b)});
+ $("next").textContent=idx===set.length-1?"Finish (Enter)":"Next (Enter)";
+}
+function pick(i){chosen=i;var bs=$("opts").children;for(var k=0;k<bs.length;k++)bs[k].classList.toggle("on",k===i)}
+function rec(){
+ var o=cur.o,right=o.filter(function(x){return x.c})[0].t;
+ answers.push({q:cur.q[1],sub:uname(cur.q),yours:chosen<0?null:o[chosen].t,right:right,ok:chosen>=0&&o[chosen].c,en:cur.q[4]||"",hi:cur.q[5]||""});
+}
+function next(){rec();idx++;if(idx>=set.length)finish();else render()}
+function finish(){
+ clearInterval(tick);
+ if(!$("quiz").classList.contains("hide")&&answers.length===idx&&idx<set.length)rec();
+ var s=Math.floor((Date.now()-t0)/1000),tot=set.length,score=answers.filter(function(a){return a.ok}).length,att=answers.filter(function(a){return a.yours!==null}).length;
+ $("sc").textContent=score+" / "+tot;
+ $("sb").textContent=Math.round(score/tot*100)+"% correct. Attempted "+att+", wrong "+(att-score)+", not answered "+(tot-att)+".";
+ $("tk").textContent="Time taken: "+Math.floor(s/60)+" min "+(s%60)+" sec";
+ var by={};answers.forEach(function(a){by[a.sub]=by[a.sub]||[0,0];by[a.sub][1]++;if(a.ok)by[a.sub][0]++});
+ var h="<b>Unit-wise score</b><br>"+Object.keys(by).map(function(k){return esc(k)+": "+by[k][0]+"/"+by[k][1]}).join("<br>")+"<br><br><b>Review with explanations / समीक्षा और व्याख्या</b>";
+ answers.forEach(function(a,i){
+  h+='<div class="rev"><b>'+(i+1)+". "+esc(a.q)+'</b><br>'+
+  (a.ok?'<span class="t">Your answer (correct): '+esc(a.right)+'</span>':
+   '<span class="f">Your answer: '+(a.yours===null?"Not answered":esc(a.yours))+'</span><br><span class="t">Correct answer: '+esc(a.right)+'</span>')+
+  (a.en||a.hi?'<div class="exp">'+(a.en?'<b>Why:</b> '+esc(a.en):'')+(a.hi?'<br><b>क्यों:</b> '+esc(a.hi):'')+'</div>':'')+'</div>'});
+ $("rev").innerHTML=h;show("result");window.scrollTo(0,0);
+}
+$("start").onclick=start;$("next").onclick=next;$("again").onclick=function(){show("setup");upd()};
+document.addEventListener("keydown",function(e){
+ if(!$("setup").classList.contains("hide")){if(e.key==="Enter"&&e.target.tagName!=="TEXTAREA"&&e.target.tagName!=="BUTTON"){e.preventDefault();start()}return}
+ if(!$("quiz").classList.contains("hide")){
+  if(e.key==="Enter"){e.preventDefault();next()}
+  else if(/^[1-4]$/.test(e.key)){var i=+e.key-1;if(i<cur.o.length)pick(i)}
+ }});
+$("add").onclick=function(){
+ var ok=0,bad=0,m=mine();
+ $("imp").value.split("\n").forEach(function(l){if(!l.trim())return;var p=l.split("|").map(function(x){return x.trim()});
+  var u=parseInt(p[0]),a=parseInt(p[6]);
+  if(p.length>=7&&u>=1&&u<=13&&a>=1&&a<=4&&p[1]&&p.slice(2,6).every(Boolean)){var o=p.slice(2,6),c=o[a-1];o.splice(a-1,1);o.unshift(c);m.push([u,p[1],o,0,p[7]||"",p[8]||""]);ok++}else bad++});
+ var msg="";try{localStorage.setItem("cmine",JSON.stringify(m))}catch(e){msg=" This browser blocked saving, so they will not be kept."}
+ $("impmsg").textContent=ok+" added, "+bad+" line(s) skipped (check the format)."+msg;if(ok)$("imp").value="";upd();
+};
+$("clr").onclick=function(){try{localStorage.removeItem("cmine")}catch(e){}$("impmsg").textContent="Your added questions were removed.";upd()};
+buildSubjects();
+</script>
+</body>
+</html>
